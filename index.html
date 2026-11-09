@@ -5,80 +5,114 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Representante – Faltas e Clientes</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1B2A41">
+<meta name="theme-color" content="#3E4F20">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#F4F5F7;--sf:#fff;--ink:#12161C;--mu:#5B6470;--ln:#E3E6EB;--nv:#1B2A41;--ac:#C2410C}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+:root{--bg:#F3F5EC;--sf:#fff;--ink:#1C2014;--mu:#5D6352;--ln:#DFE3D3;--ol:#556B2F;--old:#3E4F20;--oll:#E8EDDC;--olt:#D9E4B5;--wa:#15803D;--rd:#B91C1C}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
 button,input,select,textarea{font:inherit;color:inherit}
-#app{max-width:560px;margin:0 auto;min-height:100vh;padding:calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 160px)}
+#app{max-width:560px;margin:0 auto;min-height:100vh;padding:0 16px calc(env(safe-area-inset-bottom) + 170px)}
+.appbar{position:sticky;top:0;z-index:8;margin:0 -16px 8px;padding:calc(env(safe-area-inset-top) + 14px) 16px 12px;background:var(--bg);display:flex;align-items:center;gap:8px;min-height:64px}
+.appbar.big{padding-top:calc(env(safe-area-inset-top) + 22px)}
+.appbar h1{flex:1;min-width:0}
+.ibtn{width:44px;height:44px;border-radius:22px;border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;color:var(--ink);cursor:pointer;flex:none}
+.ibtn:active{background:var(--oll)}
 h1{font-family:'Space Grotesk',Inter,sans-serif;font-size:26px;letter-spacing:-.02em;margin:0;line-height:1.15}
 h2{font-size:17px;margin:0}
 .sub{color:var(--mu);font-size:14px;margin:4px 0 0;line-height:1.45}
 .stack{display:flex;flex-direction:column;gap:12px}
-.card{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:16px}
-.hero{background:var(--nv);color:#fff;border-radius:18px;padding:18px}
-.hero .eyebrow{color:#FDBA74}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:20px;padding:16px}
+.hero{background:var(--old);color:#fff;border-radius:22px;padding:18px}
+.hero .eyebrow{color:var(--olt)}
 .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
-.chip{display:inline-block;font-size:12px;font-weight:600;padding:4px 8px;border-radius:6px;white-space:nowrap;flex:none}
-.btn{min-height:44px;padding:0 16px;border-radius:12px;border:1px solid #CBD2DA;background:#fff;color:var(--nv);font-weight:600;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none;line-height:1.2}
-.btn.pri{background:var(--nv);border-color:var(--nv);color:#fff}
-.btn.acc{background:var(--ac);border-color:var(--ac);color:#fff}
-.btn.wa{background:#15803D;border-color:#15803D;color:#fff}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:4px 8px;border-radius:8px;white-space:nowrap;flex:none}
+.btn{min-height:46px;padding:0 18px;border-radius:14px;border:1px solid #C9CFB8;background:#fff;color:var(--old);font-weight:600;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none;line-height:1.2;transition:transform .08s}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--ol);border-color:var(--ol);color:#fff}
+.btn.dk{background:var(--old);border-color:var(--old);color:#fff}
+.btn.wa{background:var(--wa);border-color:var(--wa);color:#fff}
 .btn.ghost{border-color:transparent;background:transparent}
-.btn.danger{color:#B91C1C;border-color:#FCA5A5}
-.btn.dangerfill{background:#B91C1C;border-color:#B91C1C;color:#fff}
+.btn.tint{background:var(--oll);border-color:var(--oll)}
+.btn.danger{color:var(--rd);border-color:#F1B4B4}
+.btn.dangerfill{background:var(--rd);border-color:var(--rd);color:#fff}
 .btn.block{width:100%}
-.btn.sm{min-height:40px;font-size:14px;padding:0 12px}
+.btn.sm{min-height:40px;font-size:14px;padding:0 12px;border-radius:12px}
 .btn:disabled{opacity:.5}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.stat{background:#fff;border:1px solid var(--ln);border-radius:14px;padding:12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
-.stat b{font-family:'Space Grotesk',Inter,sans-serif;font-size:24px}
+.stat{background:#fff;border:1px solid var(--ln);border-radius:16px;padding:12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:'Space Grotesk',Inter,sans-serif;font-size:22px}
 .stat span{font-size:12px;color:var(--mu)}
 .item{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .t{font-weight:600;font-size:15px;line-height:1.3}
 .m{font-size:13px;color:var(--mu);margin-top:3px;line-height:1.4}
 .list{display:flex;flex-direction:column;gap:10px}
-.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.fchip{flex:none;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid #D5DAE1;background:#fff;color:var(--nv);font-weight:600;font-size:14px;cursor:pointer}
-.fchip[aria-pressed="true"]{background:var(--nv);color:#fff;border-color:var(--nv)}
-.search{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;background:#fff;border:1px solid #D5DAE1;border-radius:12px;color:var(--mu)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px}
+.chips::-webkit-scrollbar{display:none}
+.fchip{flex:none;min-height:38px;padding:0 14px;border-radius:19px;border:1px solid #CDD3BD;background:#fff;color:var(--old);font-weight:600;font-size:14px;cursor:pointer}
+.fchip[aria-pressed="true"]{background:var(--ol);color:#fff;border-color:var(--ol)}
+.search{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;background:#fff;border:1px solid #D3D8C4;border-radius:24px;color:var(--mu)}
 .search input{flex:1;border:0;outline:0;background:transparent;font-size:16px;color:var(--ink);min-width:0}
 label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
-.inp{min-height:48px;padding:10px 14px;border:1px solid #CBD2DA;border-radius:12px;background:#fff;font-size:16px;font-weight:400;width:100%}
+.inp{min-height:48px;padding:10px 14px;border:1px solid #C9CFB8;border-radius:14px;background:#fff;font-size:16px;font-weight:400;width:100%}
+.inp:focus{outline:2px solid var(--ol);outline-offset:0;border-color:var(--ol)}
 textarea.inp{min-height:84px;resize:vertical}
 .hint{font-size:13px;color:var(--mu);font-weight:400}
-nav.tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);display:flex;justify-content:center;padding:6px 4px calc(env(safe-area-inset-bottom) + 8px);z-index:10}
-nav.tabs button{flex:1;max-width:110px;min-height:52px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--mu);cursor:pointer;position:relative}
-nav.tabs button[aria-current="page"]{color:var(--ac);font-weight:700}
-.badge{position:absolute;top:3px;left:calc(50% + 5px);background:var(--ac);color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:flex;align-items:center;justify-content:center}
-.fab{position:fixed;right:max(16px, calc(50% - 264px));bottom:calc(env(safe-area-inset-bottom) + 84px);z-index:9;height:52px;padding:0 20px;border-radius:26px;background:var(--ac);color:#fff;border:0;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 20px rgba(194,65,12,.35);cursor:pointer}
-.ovl{position:fixed;inset:0;background:rgba(18,22,28,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:20px 20px 0 0;padding:20px 16px calc(env(safe-area-inset-bottom) + 20px)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:#FBFCF7;border-top:1px solid var(--ln);display:flex;justify-content:center;padding:8px 4px calc(env(safe-area-inset-bottom) + 8px);z-index:10}
+nav.tabs button{flex:1;max-width:110px;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--mu);cursor:pointer;position:relative;padding:0}
+nav.tabs .pill{width:60px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+nav.tabs button[aria-current="page"]{color:var(--old);font-weight:700}
+nav.tabs button[aria-current="page"] .pill{background:var(--olt)}
+.badge{position:absolute;top:-4px;left:calc(50% + 8px);background:#C2410C;color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:flex;align-items:center;justify-content:center}
+.fab{position:fixed;right:max(16px, calc(50% - 264px));bottom:calc(env(safe-area-inset-bottom) + 86px);z-index:9;height:56px;padding:0 20px;border-radius:18px;background:var(--old);color:#fff;border:0;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 18px rgba(62,79,32,.35);cursor:pointer}
+.fab:active{transform:scale(.97)}
+.ovl{position:fixed;inset:0;background:rgba(28,32,20,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center;animation:fd .15s}
+.sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:24px 24px 0 0;padding:10px 16px calc(env(safe-area-inset-bottom) + 20px);animation:up .2s ease-out}
+.handle{width:40px;height:4px;border-radius:2px;background:#CDD3BD;margin:0 auto 10px}
+@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+@keyframes fd{from{opacity:0}to{opacity:1}}
 .sheet h2{font-family:'Space Grotesk',Inter,sans-serif;font-size:20px}
 .sheethead{display:flex;justify-content:space-between;align-items:center;gap:8px}
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 150px);background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;z-index:30;max-width:90vw;display:none;box-shadow:0 8px 24px rgba(0,0,0,.2)}
-.empty{text-align:center;color:var(--mu);padding:24px 12px;font-size:14px;line-height:1.5}
-.check{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid #EEF0F3;cursor:pointer}
-.check input{width:22px;height:22px;accent-color:var(--ac);margin-top:1px;flex:none}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 156px);background:var(--ink);color:#fff;padding:12px 16px;border-radius:14px;font-size:14px;z-index:30;max-width:90vw;display:none;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.empty{text-align:center;color:var(--mu);padding:22px 12px;font-size:14px;line-height:1.5}
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid #EEF0E6;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--ol);margin-top:1px;flex:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.back{display:inline-flex;align-items:center;gap:4px;min-height:44px;border:0;background:none;color:var(--nv);font-weight:600;cursor:pointer;padding:0 8px 0 0}
-.note{background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:12px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
-.note small{color:#92400E;font-weight:600}
-details summary{cursor:pointer;font-weight:600;color:var(--nv);min-height:44px;display:flex;align-items:center}
-.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:4px;background:#E6E9EE;border-radius:12px}
-.seg button{min-height:44px;border:0;border-radius:9px;background:transparent;font-weight:600;color:#4B5563;cursor:pointer}
+.note{background:#FBF8E8;border:1px solid #EADFA8;border-radius:14px;padding:12px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.note small{color:#6B5A12;font-weight:600}
+details summary{cursor:pointer;font-weight:600;color:var(--old);min-height:44px;display:flex;align-items:center}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;padding:4px;background:#E3E8D5;border-radius:14px}
+.seg button{min-height:42px;border:0;border-radius:10px;background:transparent;font-weight:600;color:#4A5040;cursor:pointer;font-size:14px}
 .seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.spin{width:20px;height:20px;border:2.5px solid #CBD2DA;border-top-color:var(--ac);border-radius:50%;animation:sp .8s linear infinite;flex:none}
+.spin{width:20px;height:20px;border:2.5px solid #CDD3BD;border-top-color:var(--ol);border-radius:50%;animation:sp .8s linear infinite;flex:none}
 @keyframes sp{to{transform:rotate(360deg)}}
-.cliline{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #EEF0F3;font-size:14px}
-a{color:var(--ac)}
-.linkbtn{border:0;background:none;padding:0;color:inherit;text-align:left;cursor:pointer;width:100%}
+.line{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-top:1px solid #EEF0E6;font-size:14px;align-items:center}
+.line:first-child{border-top:0}
+a{color:var(--ol)}
+.linkbtn{border:0;background:none;padding:0;color:inherit;text-align:left;cursor:pointer;width:100%;font:inherit}
+.linkbtn.line{padding:12px 0;border-top:1px solid #EEF0E6;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left}
+.linkbtn.line:first-child{border-top:0}
+.menu .linkbtn{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid #EEF0E6}
+.menu .linkbtn:first-child{border-top:0}
+.mic{width:40px;height:40px;border-radius:12px;background:var(--oll);color:var(--old);display:flex;align-items:center;justify-content:center;flex:none}
+.num{width:28px;height:28px;border-radius:14px;background:var(--oll);color:var(--old);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.num.ok{background:var(--ol);color:#fff}
+.sug{display:flex;flex-direction:column;border:1px solid var(--ln);border-radius:14px;overflow:hidden}
+.sug button{border:0;border-top:1px solid #EEF0E6;background:#fff;text-align:left;padding:10px 14px;cursor:pointer;font-size:14px}
+.sug button:first-child{border-top:0}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.days label{position:relative}
+.days input{position:absolute;opacity:0;width:1px;height:1px}
+.days span{display:inline-flex;min-width:46px;height:40px;align-items:center;justify-content:center;border-radius:12px;border:1px solid #CDD3BD;font-weight:600;font-size:14px;cursor:pointer;color:var(--old)}
+.days input:checked + span{background:var(--ol);border-color:var(--ol);color:#fff}
+.days input:focus-visible + span{outline:2px solid var(--ink)}
+.pl{border:1px solid var(--ln);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.pl .grid3 input{min-height:44px}
+.money{font-family:'Space Grotesk',Inter,sans-serif;font-weight:700}
 </style>
 </head>
 <body>
@@ -86,7 +120,8 @@ a{color:var(--ac)}
 <div id="modal"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
-const VERSAO = '1.3';
+const VERSAO = '1.5';
+const PEDIDOS = false; // pedidos ficam no Mercos
 // ponte opcional no Termux (OneDrive automático e leitura de prints mais precisa)
 const PONTE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') && location.port === '8765' ? '' : 'http://127.0.0.1:8765';
 const ST = {
@@ -94,15 +129,20 @@ const ST = {
   armazenando: { label: 'Armazenando', fg: '#92400E', bg: '#FEF3C7', rank: 1 },
   disponivel: { label: 'Disponível', fg: '#166534', bg: '#DCFCE7', rank: 2 },
   ofertado: { label: 'Ofertado', fg: '#1E40AF', bg: '#DBEAFE', rank: 3 },
-  vendido: { label: 'Vendido', fg: '#FFFFFF', bg: '#1B2A41', rank: 4 },
+  vendido: { label: 'Vendido', fg: '#FFFFFF', bg: '#3E4F20', rank: 4 },
   cancelado: { label: 'Cancelado', fg: '#4B5563', bg: '#F3F4F6', rank: 5 }
 };
 const ORDEM = ['disponivel', 'armazenando', 'aguardando', 'ofertado', 'vendido', 'cancelado'];
+const STP = { anotado: { label: 'Anotado', fg: '#374151', bg: '#E5E7EB' }, enviado: { label: 'Enviado', fg: '#1E40AF', bg: '#DBEAFE' }, faturado: { label: 'Faturado', fg: '#166534', bg: '#DCFCE7' } };
+const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+const MSG_DISP = 'Olá{comprador}! Boa notícia: os produtos que você pediu já estão disponíveis na Ramada:\n{lista}\n\nPosso incluir no seu pedido?';
+const MSG_ARM = 'Olá{comprador}! Os produtos que você pediu já chegaram na Ramada e estão em liberação para venda:\n{lista}\n\nAssim que liberar te aviso. Quer que eu já deixe no seu próximo pedido?';
 const I = {
   home: '<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   box: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
   store: '<path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11h18V9"/><path d="M3 9h18"/><path d="M9 20v-6h6v6"/>',
   truck: '<path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+  grid: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
   cloud: '<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4 4 0 0 1 0 9z"/>',
   plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
   back: '<path d="M15 6l-6 6 6 6"/>',
@@ -112,18 +152,29 @@ const I = {
   more: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
   x: '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>',
   image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
-  chev: '<path d="M9 6l6 6-6 6"/>'
+  chev: '<path d="M9 6l6 6-6 6"/>',
+  cart: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h2l2.5 11h11L21 8H6.2"/>',
+  book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M8 7h7"/>',
+  route: '<circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7"/>',
+  check: '<path d="M5 12l5 5 9-10"/>',
+  up: '<path d="M6 15l6-6 6 6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+  msg: '<path d="M4 5h16v11H8l-4 4z"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'
 };
 const svg = (p, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 
-let srv = { online: false, onedrive: false, ultimoSync: null, erroSync: null, ocr: false, melhoraImagem: false, pastaCelular: false, versao: VERSAO };
+let srv = { online: false, onedrive: false, ultimoSync: null, erroSync: null, ocr: false, versao: VERSAO };
 const items = new Map();
 const S = {
-  tab: 'inicio', cli: null, filtro: 'disponivel', busca: '', buscaCli: '', nota: '',
-  loaded: false, slow: false, noDb: false, dbErr: null, modal: null, ctl: null,
-  imp: { status: 'disponivel', fase: 'idle', res: null, match: null, sel: new Set(), erro: null, texto: '', mostraTexto: false }
+  tab: 'inicio', sub: null, cli: null, cliTab: 'faltas', filtro: 'disponivel', busca: '', buscaCli: '', buscaCat: '', nota: '',
+  loaded: false, dbErr: null, modal: null,
+  imp: { status: 'disponivel', fase: 'idle', res: null, match: null, sel: new Set(), erro: null, texto: '', mostraTexto: false, progresso: '' }
 };
 
+/* ---------- utilidades ---------- */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
@@ -131,19 +182,40 @@ const normCode = s => String(s || '').replace(/\D/g, '').replace(/^0+/, '');
 const now = () => new Date().toISOString();
 const dm = iso => { if (!iso) return ''; const d = new Date(iso); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); };
 const hm = iso => { const d = new Date(iso); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+const dataISO = (n = 0) => { const d = new Date(); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const hojeISO = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const newId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const pl = (n, a, b) => n === 1 ? a : b;
 const sameMonth = iso => { if (!iso) return false; const a = new Date(iso), b = new Date(); return a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear(); };
+const diasDesde = iso => iso ? Math.floor((Date.now() - new Date(iso)) / 864e5) : null;
 const groupBy = (arr, k) => { const m = new Map(); arr.forEach(x => { const v = x[k] || '_'; if (!m.has(v)) m.set(v, []); m.get(v).push(x); }); return m; };
 const chip = st => { const s = ST[st] || ST.aguardando; return `<span class="chip" style="color:${s.fg};background:${s.bg}">${s.label}</span>`; };
+const chipP = st => { const s = STP[st] || STP.anotado; return `<span class="chip" style="color:${s.fg};background:${s.bg}">${s.label}</span>`; };
+const reais = v => (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const numBR = s => { const v = parseFloat(String(s || '').replace(/\./g, '').replace(',', '.')); return isNaN(v) ? 0 : v; };
+const fmtNum = v => v ? String(v).replace('.', ',') : '';
+const vibrar = () => { try { navigator.vibrate && navigator.vibrate(12); } catch (e) { } };
 
 const all = () => [...items.values()];
-const clientes = () => all().filter(x => x.kind === 'cliente').sort((a, b) => norm(a.nome).localeCompare(norm(b.nome)));
-const faltas = () => all().filter(x => x.kind === 'falta');
+const doTipo = k => all().filter(x => x.kind === k);
+const clientes = () => doTipo('cliente').sort((a, b) => norm(a.nome).localeCompare(norm(b.nome)));
+const faltas = () => doTipo('falta');
+const pedidos = () => doTipo('pedido').sort((a, b) => (b.em || '').localeCompare(a.em || ''));
+const produtos = () => doTipo('produto');
+const imps = () => doTipo('imp').sort((a, b) => (b.em || '').localeCompare(a.em || ''));
 const cli = id => items.get(id);
 const cfg = () => items.get('cfg') || {};
-const imps = () => all().filter(x => x.kind === 'imp').sort((a, b) => (b.em || '').localeCompare(a.em || ''));
+const prodPorCodigo = c => { const k = normCode(c); return k ? items.get('p_' + k) : null; };
+const roteiro = (d) => items.get('rot_' + (d || hojeISO()));
+const endCompleto = c => [c.endereco, c.cidade].filter(Boolean).join(', ');
+const mapsBusca = c => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(endCompleto(c));
+function mapsRota(lista) {
+  const ends = lista.filter(c => c && c.endereco).map(endCompleto).slice(0, 4); if (!ends.length) return '';
+  const dest = ends.pop();
+  return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(dest) + (ends.length ? '&waypoints=' + encodeURIComponent(ends.join('|')) : '');
+}
+const freqDe = c => Number(c.freq) || Number(cfg().freq) || 14;
+const atraso = c => { const d = diasDesde(c.ultimaVisita); return d === null ? 999 : d - freqDe(c); };
 
 /* ---------- dados no celular (IndexedDB) ---------- */
 let idb = null;
@@ -164,20 +236,23 @@ function idbReq(store, mode, fn) {
 }
 const metaGet = k => idbReq('meta', 'readonly', s => s.get(k));
 const metaSet = (k, v) => idbReq('meta', 'readwrite', s => s.put(v, k));
-function aposMudar() { render(); if (S.modal && S.modal.type === 'faltaMenu') renderModal(); agendarEnvio(); }
-async function save(id, data) { const obj = { ...data, id }; await idbReq('itens', 'readwrite', s => s.put(obj)); items.set(id, obj); aposMudar(); }
+function aposMudar() { render(); if (S.modal && ['faltaMenu', 'pedidoMenu'].includes(S.modal.type)) renderModal(); agendarEnvio(); }
+async function save(id, data, quieto) { const obj = { ...data, id }; await idbReq('itens', 'readwrite', s => s.put(obj)); items.set(id, obj); if (!quieto) aposMudar(); }
+async function saveMany(list) { if (!list.length) return; await idbReq('itens', 'readwrite', s => { list.forEach(o => s.put(o)); }); list.forEach(o => items.set(o.id, o)); aposMudar(); }
 async function patch(id, data) { const atual = items.get(id); if (!atual) throw new Error('não existe'); await save(id, { ...atual, ...data }); }
 async function del(id) { await idbReq('itens', 'readwrite', s => s.delete(id)); items.delete(id); aposMudar(); }
 async function recarregar() { const l = await idbReq('itens', 'readonly', s => s.getAll()); items.clear(); (l || []).forEach(x => items.set(x.id, x)); }
 async function importarItens(lista) {
-  let n = 0;
-  for (const x of lista || []) {
-    if (!x || typeof x.id !== 'string' || !x.kind || !/^[A-Za-z0-9_\-.~:@+]{1,150}$/.test(x.id)) continue;
-    await idbReq('itens', 'readwrite', s => s.put(x)); items.set(x.id, x); n++;
-  }
-  aposMudar(); return n;
+  const ok = (lista || []).filter(x => x && typeof x.id === 'string' && x.kind && /^[A-Za-z0-9_\-.~:@+]{1,150}$/.test(x.id));
+  await saveMany(ok); return ok.length;
 }
 const pacote = () => ({ app: 'representante-faltas', versao: VERSAO, exportadoEm: now(), itens: all() });
+async function setStatus(id, st, via) {
+  const f = items.get(id); if (!f || f.status === st) return;
+  const h = Array.isArray(f.hist) ? f.hist.slice(-30) : [];
+  h.push({ s: st, em: now(), via: via || 'manual' });
+  await patch(id, { status: st, atualizadoEm: now(), hist: h });
+}
 
 /* ---------- ponte com o Termux (opcional) ---------- */
 async function api(method, path, body, raw, ms) {
@@ -207,42 +282,54 @@ async function enviarTermux() {
   } catch (e) { srv = { ...srv, online: false }; return false; }
   finally { if (S.tab === 'mais') render(); }
 }
-async function compartilharBackup() {
-  const nome = `backup-representante-${hojeISO()}.json`;
-  const file = new File([JSON.stringify(pacote())], nome, { type: 'application/json' });
+async function compartilharArquivo(nome, blob, titulo) {
+  const file = new File([blob], nome, { type: blob.type });
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: 'Backup Representante' }); meta.ultimoCompartilhado = now(); await metaSet('ultimoCompartilhado', meta.ultimoCompartilhado); toast('Backup enviado'); render(); return; }
-    catch (e) { if (e && e.name === 'AbortError') return; }
+    try { await navigator.share({ files: [file], title: titulo }); return true; }
+    catch (e) { if (e && e.name === 'AbortError') return false; }
   }
-  baixar(nome, file); meta.ultimoCompartilhado = now(); await metaSet('ultimoCompartilhado', meta.ultimoCompartilhado); toast('Arquivo salvo em Downloads. Envie ao OneDrive pelo app do OneDrive.'); render();
+  baixar(nome, blob); return true;
+}
+async function compartilharBackup() {
+  const ok = await compartilharArquivo(`backup-representante-${hojeISO()}.json`, new Blob([JSON.stringify(pacote())], { type: 'application/json' }), 'Backup Representante');
+  if (ok) { meta.ultimoCompartilhado = now(); await metaSet('ultimoCompartilhado', meta.ultimoCompartilhado); toast('Backup enviado'); render(); }
 }
 function baixar(nome, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); }
-function csv() {
-  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+function csvFaltas() {
   const linhas = [['Cliente', 'Cidade', 'Código', 'Produto', 'Marca', 'Qtd', 'Situação', 'Anotado em', 'Atualizado em', 'Obs.'].map(q).join(';')];
   faltas().sort((a, b) => (a.criadoEm || '').localeCompare(b.criadoEm || '')).forEach(f => { const c = cli(f.clienteId) || {}; linhas.push([c.nome, c.cidade, f.codigo, f.produto, f.marca, f.qtd, (ST[f.status] || {}).label, f.criadoEm ? new Date(f.criadoEm).toLocaleDateString('pt-BR') : '', f.atualizadoEm ? new Date(f.atualizadoEm).toLocaleDateString('pt-BR') : '', f.obs].map(q).join(';')); });
   return '﻿' + linhas.join('\r\n');
 }
-const ultimaCopia = () => [meta.ultimoOneDrive, meta.ultimoCompartilhado].filter(Boolean).sort().pop() || null;
-async function setStatus(id, st, via) {
-  const f = items.get(id); if (!f || f.status === st) return;
-  const h = Array.isArray(f.hist) ? f.hist.slice(-30) : [];
-  h.push({ s: st, em: now(), via: via || 'manual' });
-  await patch(id, { status: st, atualizadoEm: now(), hist: h });
+function csvPedidos() {
+  const linhas = [['Data', 'Cliente', 'Situação', 'Código', 'Produto', 'Qtd', 'Preço un.', 'Subtotal', 'Total do pedido', 'Obs.'].map(q).join(';')];
+  pedidos().slice().reverse().forEach(p => { const c = cli(p.clienteId) || {}; (p.itens || []).forEach(it => linhas.push([new Date(p.em).toLocaleDateString('pt-BR'), c.nome, (STP[p.status] || {}).label, it.codigo, it.produto, it.qtd, fmtNum(it.preco), fmtNum(+(it.qtd * it.preco).toFixed(2)), fmtNum(p.total), p.obs].map(q).join(';'))); });
+  return '﻿' + linhas.join('\r\n');
 }
+const ultimaCopia = () => [meta.ultimoOneDrive, meta.ultimoCompartilhado].filter(Boolean).sort().pop() || null;
 
 let toastT = null;
 function toast(msg) { const el = $('#toast'); el.textContent = msg; el.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => { el.style.display = 'none'; }, 3200); }
 
-function waLink(c, list, tipo) {
+/* ---------- mensagens ---------- */
+function montarMsg(modelo, c, list) {
   const nome = c && c.comprador ? ' ' + c.comprador.trim().split(' ')[0] : '';
   const linhas = (list || []).map(f => `• ${f.produto || 'Produto'}${f.codigo ? ' (cód. ' + f.codigo + ')' : ''}${f.qtd ? ' – ' + f.qtd + ' un' : ''}`).join('\n');
-  let txt = '';
-  if (tipo === 'arm') txt = `Olá${nome}! Os produtos que você pediu já chegaram na Ramada e estão em liberação para venda:\n${linhas}\n\nAssim que liberar te aviso. Quer que eu já deixe no seu próximo pedido?`;
-  else if (tipo === 'disp') txt = `Olá${nome}! Boa notícia: os produtos que você pediu já estão disponíveis na Ramada:\n${linhas}\n\nPosso incluir no seu pedido?`;
+  return modelo.replace(/\{comprador\}/g, nome).replace(/\{lista\}/g, linhas).replace(/\{loja\}/g, c ? c.nome : '');
+}
+function waUrl(c, txt) {
   const tel = String(c && c.telefone || '').replace(/\D/g, '');
   const num = tel ? (tel.length <= 11 ? '55' + tel : tel) : '';
   return `https://wa.me/${num}${txt ? '?text=' + encodeURIComponent(txt) : ''}`;
+}
+function waLink(c, list, tipo) {
+  if (!tipo) return waUrl(c, '');
+  return waUrl(c, montarMsg(tipo === 'arm' ? (cfg().msgArm || MSG_ARM) : (cfg().msgDisp || MSG_DISP), c, list));
+}
+function textoPedido(p) {
+  const c = cli(p.clienteId) || {};
+  const l = (p.itens || []).map(it => `• ${it.qtd}x ${it.produto || ''}${it.codigo ? ' (cód. ' + it.codigo + ')' : ''}${it.preco ? ' – ' + reais(it.preco) + ' un' : ''}`).join('\n');
+  return `Pedido – ${c.nome || ''}\nData: ${new Date(p.em).toLocaleDateString('pt-BR')}\n\n${l}\n\nTotal: ${reais(p.total)}${p.obs ? '\nObs.: ' + p.obs : ''}`;
 }
 
 /* ---------- views ---------- */
@@ -250,38 +337,54 @@ function render() {
   const a = document.activeElement; const fid = a && a.id && a.closest && a.closest('#app') ? a.id : null; let pos = null;
   try { pos = a.selectionStart; } catch (e) { }
   let body;
-  if (S.dbErr) body = `<div class="card stack"><h2>Não consegui abrir seus dados</h2><p class="sub">O armazenamento do navegador está bloqueado ou cheio. Feche o app e abra de novo. Se continuar, me avise antes de limpar qualquer dado do Chrome.</p><button class="btn pri" data-act="reconectar">Tentar de novo</button></div>`;
-  else if (!S.loaded) body = `<div class="card row" style="gap:12px"><div class="spin"></div><span>Carregando seus dados…</span></div>`;
+  if (S.dbErr) body = `${barra('Representante')}<div class="card stack"><h2>Não consegui abrir seus dados</h2><p class="sub">O armazenamento do navegador está bloqueado ou cheio. Feche o app e abra de novo. Se continuar, me avise antes de limpar qualquer dado do Chrome.</p><button class="btn pri" data-act="reconectar">Tentar de novo</button></div>`;
+  else if (!S.loaded) body = `${barra('Representante')}<div class="card row" style="gap:12px"><div class="spin"></div><span>Carregando seus dados…</span></div>`;
   else body = ({ inicio: vInicio, faltas: vFaltas, chegadas: vChegadas, clientes: vClientes, mais: vMais }[S.tab])();
   $('#app').innerHTML = body + vNav() + vFab();
   if (fid) { const el = document.getElementById(fid); if (el) { el.focus(); if (pos != null) try { el.setSelectionRange(pos, pos); } catch (e) { } } }
 }
-
+function barra(titulo, voltar, acao, big) {
+  return `<header class="appbar${big ? ' big' : ''}">${voltar ? `<button class="ibtn" data-act="${voltar}" aria-label="Voltar">${svg(I.back, 24)}</button>` : ''}<h1>${titulo}</h1>${acao || ''}</header>`;
+}
 function vNav() {
   const disp = S.loaded ? faltas().filter(f => f.status === 'disponivel').length : 0;
-  const t = [['inicio', 'Início', I.home, disp], ['faltas', 'Faltas', I.box, 0], ['chegadas', 'Chegadas', I.truck, 0], ['clientes', 'Clientes', I.store, 0], ['mais', 'Backup', I.cloud, 0]];
-  return `<nav class="tabs" aria-label="Navegação principal">${t.map(([k, l, ic, b]) => `<button data-act="tab" data-t="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${svg(ic, 24)}${l}${b ? `<span class="badge">${b}</span>` : ''}</button>`).join('')}</nav>`;
+  const t = [['inicio', 'Início', I.home, disp], ['clientes', 'Clientes', I.store, 0], ['faltas', 'Faltas', I.box, 0], ['chegadas', 'Chegadas', I.truck, 0], ['mais', 'Mais', I.grid, 0]];
+  return `<nav class="tabs" aria-label="Navegação principal">${t.map(([k, l, ic, b]) => `<button data-act="tab" data-t="${k}" ${S.tab === k ? 'aria-current="page"' : ''}><span class="pill">${svg(ic, 22)}</span>${l}${b ? `<span class="badge">${b}</span>` : ''}</button>`).join('')}</nav>`;
 }
 function vFab() {
-  if (!S.loaded || !['inicio', 'faltas', 'clientes'].includes(S.tab)) return '';
-  return `<button class="fab" data-act="novaFalta" ${S.tab === 'clientes' && S.cli ? `data-id="${esc(S.cli)}"` : ''}>${svg(I.plus, 20)}Registrar falta</button>`;
+  if (!S.loaded) return '';
+  if (S.tab === 'inicio' || S.tab === 'faltas') return `<button class="fab" data-act="novaFalta">${svg(I.plus, 22)}Registrar falta</button>`;
+  if (S.tab === 'clientes' && !S.cli) return `<button class="fab" data-act="novoCli">${svg(I.plus, 22)}Novo cliente</button>`;
+  if (S.tab === 'mais' && S.sub === 'pedidos') return `<button class="fab" data-act="novoPedido">${svg(I.plus, 22)}Novo pedido</button>`;
+  if (S.tab === 'mais' && S.sub === 'catalogo') return `<button class="fab" data-act="novoProduto">${svg(I.plus, 22)}Adicionar produto</button>`;
+  return '';
 }
 
 function faltaCard(f, showCli = true) {
   const c = cli(f.clienteId);
-  const meta = [f.codigo ? 'Cód. ' + f.codigo : null, f.marca || null, f.qtd ? f.qtd + ' un' : null, 'anotado ' + dm(f.criadoEm)].filter(Boolean).join(' · ');
+  const meta2 = [f.codigo ? 'Cód. ' + f.codigo : null, f.marca || null, f.qtd ? f.qtd + ' un' : null, 'anotado ' + dm(f.criadoEm)].filter(Boolean).join(' · ');
   let acts = '';
   if (f.status === 'disponivel') acts = `<button class="btn sm" data-act="st" data-id="${f.id}" data-s="ofertado">Ofereci</button><button class="btn sm pri" data-act="st" data-id="${f.id}" data-s="vendido">Vendi</button>`;
   else if (f.status === 'ofertado') acts = `<button class="btn sm" data-act="st" data-id="${f.id}" data-s="cancelado">Não quis</button><button class="btn sm pri" data-act="st" data-id="${f.id}" data-s="vendido">Vendi</button>`;
+  else if (f.status === 'aguardando' || f.status === 'armazenando') acts = `<button class="btn sm tint" data-act="temMercos" data-id="${f.id}">${svg(I.check, 16)}Tem no Mercos</button>`;
+  if (f.codigo && !['vendido', 'cancelado'].includes(f.status)) acts += `<button class="btn sm ghost" data-act="copiar" data-v="${esc(f.codigo)}">Copiar código</button>`;
   return `<article class="card" style="padding:14px">
     <div class="item"><div style="min-width:0">
       <div class="t">${esc(f.produto || '(sem descrição)')}</div>
       ${showCli && c ? `<div class="m" style="color:var(--ink);font-weight:500">${esc(c.nome)}</div>` : ''}
-      <div class="m">${esc(meta)}</div>
+      <div class="m">${esc(meta2)}</div>
       ${f.obs ? `<div class="m">Obs.: ${esc(f.obs)}</div>` : ''}
     </div>${chip(f.status)}</div>
     <div class="row" style="margin-top:10px">${acts}<button class="btn sm ghost" data-act="faltaMenu" data-id="${f.id}">${svg(I.more, 20)} Opções</button></div>
   </article>`;
+}
+function pedidoCard(p, showCli = true) {
+  const c = cli(p.clienteId) || {};
+  const n = (p.itens || []).length;
+  return `<button class="card linkbtn" data-act="pedidoMenu" data-id="${p.id}"><div class="item"><div style="min-width:0">
+    <div class="t">${showCli ? esc(c.nome || 'Cliente removido') : 'Pedido de ' + dm(p.em)}</div>
+    <div class="m">${showCli ? dm(p.em) + ' · ' : ''}${n} ${pl(n, 'item', 'itens')}${p.obs ? ' · ' + esc(p.obs) : ''}</div>
+    <div class="money" style="margin-top:6px">${reais(p.total)}</div></div>${chipP(p.status)}</div></button>`;
 }
 
 function saud() { const h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; }
@@ -289,44 +392,66 @@ function saud() { const h = new Date().getHours(); return h < 12 ? 'Bom dia' : h
 function vInicio() {
   const fs = faltas();
   const disp = fs.filter(f => f.status === 'disponivel'), arm = fs.filter(f => f.status === 'armazenando'), ag = fs.filter(f => f.status === 'aguardando');
-  const of = fs.filter(f => f.status === 'ofertado'), vend = fs.filter(f => f.status === 'vendido' && sameMonth(f.atualizadoEm));
   const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-  let h = `<header style="margin-bottom:18px"><p class="sub" style="margin:0 0 4px">${esc(hoje.charAt(0).toUpperCase() + hoje.slice(1))}</p><h1>${saud()}!</h1></header><div class="stack">`;
+  let h = `<header class="appbar big"><div style="flex:1"><p class="sub" style="margin:0 0 4px">${esc(hoje.charAt(0).toUpperCase() + hoje.slice(1))}</p><h1>${saud()}!</h1></div></header><div class="stack">`;
   if (!clientes().length) {
     h += `<section class="card stack"><span class="eyebrow">Comece por aqui</span>
-      <p class="sub" style="margin:0">1. Cadastre seus clientes.<br>2. Quando faltar um produto, registre a falta com o <b>código Ramada</b>.<br>3. Quando chegar o print no grupo da Ramada, envie na aba <b>Chegadas</b>: o app encontra quem estava esperando.</p>
+      <p class="sub" style="margin:0">1. Cadastre seus clientes e os dias de visita.<br>2. Quando faltar um produto, registre a falta com o <b>código Ramada</b>.<br>3. Quando chegar o print no grupo da Ramada, envie em <b>Chegadas</b>: o app encontra quem estava esperando e aprende os produtos.</p>
       <button class="btn pri" data-act="novoCli">${svg(I.plus, 20)}Cadastrar primeiro cliente</button></section>`;
   }
   const uc = ultimaCopia();
-  if (fs.length && (!uc || (Date.now() - new Date(uc)) > 3 * 864e5)) {
-    h += `<button class="card linkbtn row" data-act="tab" data-t="mais" style="justify-content:space-between;border-color:#FDE68A;background:#FFFBEB"><span><span class="t" style="display:block">Faça a cópia no OneDrive</span><span class="m" style="display:block">Última cópia: ${uc ? dm(uc) : 'nunca'}. Seus dados estão só neste celular.</span></span>${svg(I.chev, 20)}</button>`;
+  if (all().length > 2 && (!uc || (Date.now() - new Date(uc)) > 3 * 864e5)) {
+    h += `<button class="card linkbtn row" data-act="irBackup" style="justify-content:space-between;flex-wrap:nowrap;border-color:#EADFA8;background:#FBF8E8"><span><span class="t" style="display:block">Faça a cópia no OneDrive</span><span class="m" style="display:block">Última cópia: ${uc ? dm(uc) : 'nunca'}. Seus dados estão só neste celular.</span></span>${svg(I.chev, 20)}</button>`;
+  }
+  // roteiro
+  const rot = roteiro(); const rl = rot ? (rot.clientes || []).filter(id => cli(id)) : [];
+  if (clientes().length) {
+    const feitos = rl.filter(id => rot.visitados && rot.visitados[id]).length;
+    h += `<section class="card stack" style="gap:0"><div class="item" style="align-items:center;margin-bottom:6px"><div><span class="eyebrow">Roteiro de hoje</span>${rl.length ? `<div class="m">${feitos} de ${rl.length} ${pl(rl.length, 'visita feita', 'visitas feitas')}</div>` : ''}</div><button class="btn sm tint" data-act="montarRoteiro">${svg(rl.length ? I.edit : I.route, 18)}${rl.length ? 'Editar' : 'Montar'}</button></div>`;
+    if (!rl.length) h += `<p class="hint" style="margin:6px 0 0">Monte o roteiro com os clientes que vai visitar hoje. O app sugere os do dia e os atrasados.</p>`;
+    const pend = rl.filter(id => !(rot.visitados && rot.visitados[id])).map(cli);
+    const rota = mapsRota(pend);
+    const am = roteiro(dataISO(1)); const amN = am ? (am.clientes || []).filter(id => cli(id)).length : 0;
+    var rodapeRot = (rota ? `<a class="btn sm tint" style="margin-top:10px" href="${esc(rota)}" target="_blank" rel="noopener">${svg(I.route, 18)}Abrir rota no Maps${pend.filter(c => c.endereco).length > 4 ? ' (próximas 4)' : ''}</a>` : (rl.length && pend.length && !pend.some(c => c.endereco) ? `<p class="hint" style="margin:10px 0 0">Cadastre o endereço dos clientes para abrir a rota no Maps.</p>` : '')) + (amN ? `<p class="hint" style="margin:10px 0 0">Amanhã: ${amN} ${pl(amN, 'cliente', 'clientes')} no roteiro.</p>` : '');
+    rl.forEach((id, i) => {
+      const c = cli(id); const ok = rot.visitados && rot.visitados[id]; const nd = fs.filter(f => f.clienteId === id && f.status === 'disponivel').length;
+      h += `<div class="line"><span class="num ${ok ? 'ok' : ''}">${ok ? svg(I.check, 16) : i + 1}</span><button class="linkbtn" style="flex:1;min-width:0" data-act="openCli" data-id="${esc(id)}"><span class="t" style="display:block">${esc(c.nome)}</span><span class="m" style="display:block">${esc(c.cidade || '')}${ok ? (c.cidade ? ' · ' : '') + 'visitado ' + hm(ok) : ''}</span>${nd ? `<span class="chip" style="color:#166534;background:#DCFCE7;margin-top:4px">${nd} para oferecer</span>` : ''}</button>${ok ? '' : `<button class="btn sm pri" data-act="visitei" data-id="${esc(id)}">Visitei</button>`}</div>`;
+    });
+    h += rodapeRot + `</section>`;
   }
   if (disp.length) {
     const g = groupBy(disp, 'clienteId');
-    h += `<section class="hero stack" style="gap:8px"><span class="eyebrow">Disponível para venda</span><h2 style="font-size:19px;color:#fff;line-height:1.3">${disp.length} ${pl(disp.length, 'falta liberada', 'faltas liberadas')} para oferecer</h2><p style="margin:0;color:#CBD5E1;font-size:14px">${g.size} ${pl(g.size, 'cliente esperando', 'clientes esperando')}. Ofereça hoje.</p></section>`;
+    h += `<section class="hero stack" style="gap:8px"><span class="eyebrow">Disponível para venda</span><h2 style="font-size:19px;color:#fff;line-height:1.3">${disp.length} ${pl(disp.length, 'falta liberada', 'faltas liberadas')} para oferecer</h2><p style="margin:0;color:#DDE5C8;font-size:14px">${g.size} ${pl(g.size, 'cliente esperando', 'clientes esperando')}. Ofereça hoje.</p></section>`;
     for (const [cid, list] of g) {
       const c = cli(cid) || { nome: 'Cliente removido' };
       h += `<article class="card stack" style="gap:8px"><button class="linkbtn item" data-act="openCli" data-id="${esc(cid)}"><span class="t">${esc(c.nome)}</span>${svg(I.chev, 20)}</button>
-        <div>${list.map(f => `<div class="cliline"><span>${esc(f.produto || '')}${f.codigo ? ' <span class="hint">· ' + esc(f.codigo) + '</span>' : ''}</span><span class="hint">${f.qtd ? f.qtd + ' un' : ''}</span></div>`).join('')}</div>
+        <div>${list.map(f => `<div class="line"><span>${esc(f.produto || '')}${f.codigo ? ' <span class="hint">· ' + esc(f.codigo) + '</span>' : ''}</span><span class="hint">${f.qtd ? f.qtd + ' un' : ''}</span></div>`).join('')}</div>
         <div class="grid2"><a class="btn wa sm" href="${esc(waLink(c, list, 'disp'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a><button class="btn sm" data-act="ofertarCli" data-id="${esc(cid)}">Ofereci tudo</button></div></article>`;
     }
-  } else if (fs.length) {
-    h += `<div class="card"><div class="t">Nenhuma falta liberada agora</div><p class="sub">Quando chegar um print no grupo da Ramada, envie na aba Chegadas.</p></div>`;
   }
   if (arm.length) {
     const g = groupBy(arm, 'clienteId');
-    h += `<section class="card stack" style="gap:8px"><div class="item"><span class="eyebrow" style="color:#92400E">Armazenando · em liberação</span><span class="chip" style="color:#92400E;background:#FEF3C7">${arm.length}</span></div>`;
+    h += `<section class="card stack" style="gap:4px"><div class="item"><span class="eyebrow" style="color:#92400E">Armazenando · em liberação</span><span class="chip" style="color:#92400E;background:#FEF3C7">${arm.length}</span></div>`;
     for (const [cid, list] of g) {
       const c = cli(cid) || { nome: 'Cliente removido' };
-      h += `<div class="cliline" style="align-items:center"><span><b>${esc(c.nome)}</b><br><span class="hint">${list.map(f => esc(f.produto || f.codigo)).join(', ')}</span></span><a class="btn sm" href="${esc(waLink(c, list, 'arm'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a></div>`;
+      h += `<div class="line"><span><b>${esc(c.nome)}</b><br><span class="hint">${list.map(f => esc(f.produto || f.codigo)).join(', ')}</span></span><a class="btn sm" href="${esc(waLink(c, list, 'arm'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a></div>`;
     }
     h += `</section>`;
   }
-  if (fs.length) {
-    h += `<section class="grid3">
-      <button class="stat" data-act="filtro" data-f="aguardando"><b>${ag.length}</b><span>Aguardando</span></button>
-      <button class="stat" data-act="filtro" data-f="ofertado"><b>${of.length}</b><span>Ofertadas</span></button>
-      <button class="stat" data-act="filtro" data-f="vendido"><b>${vend.length}</b><span>Vendidas no mês</span></button></section>`;
+  // atrasados
+  const atr = clientes().filter(c => atraso(c) >= 0 && !(rl.includes(c.id))).sort((a, b) => atraso(b) - atraso(a)).slice(0, 4);
+  if (atr.length) {
+    h += `<section class="card stack" style="gap:0"><span class="eyebrow" style="margin-bottom:4px">Precisam de visita</span>${atr.map(c => { const d = diasDesde(c.ultimaVisita); return `<div class="line"><button class="linkbtn" style="flex:1;min-width:0" data-act="openCli" data-id="${esc(c.id)}"><span class="t" style="display:block">${esc(c.nome)}</span><span class="m" style="display:block;color:${d === null || d > freqDe(c) + 7 ? 'var(--rd)' : 'var(--mu)'}">${d === null ? 'Nunca visitado no app' : 'Sem visita há ' + d + ' dias'}</span></button><button class="btn sm tint" data-act="rotAdd" data-id="${esc(c.id)}">${svg(I.plus, 16)}Roteiro</button></div>`; }).join('')}</section>`;
+  }
+  // resumo do mês
+  if (fs.length || clientes().length) {
+    const vm = clientes().reduce((s, c) => s + (Array.isArray(c.visitas) ? c.visitas.filter(v => sameMonth(v.em)).length : 0), 0);
+    const an = fs.filter(f => sameMonth(f.criadoEm)).length;
+    const rec = fs.filter(f => f.status === 'vendido' && sameMonth(f.atualizadoEm)).length;
+    h += `<span class="eyebrow" style="margin-top:4px">Resumo do mês</span><section class="grid3">
+      <button class="stat" data-act="tab" data-t="clientes"><b>${vm}</b><span>Visitas feitas</span></button>
+      <button class="stat" data-act="filtro" data-f="todas"><b>${an}</b><span>Faltas anotadas</span></button>
+      <button class="stat" data-act="filtro" data-f="vendido"><b>${rec}</b><span>Viraram venda</span></button></section>`;
   }
   return h + '</div>';
 }
@@ -335,10 +460,10 @@ function vFaltas() {
   const fs = faltas(); const cnt = k => fs.filter(f => f.status === k).length;
   const filtros = [['disponivel', 'Disponível'], ['armazenando', 'Armazenando'], ['aguardando', 'Aguardando'], ['ofertado', 'Ofertadas'], ['vendido', 'Vendidas'], ['cancelado', 'Canceladas'], ['todas', 'Todas']];
   let list = S.filtro === 'todas' ? fs : fs.filter(f => f.status === S.filtro);
-  const q = norm(S.busca);
-  if (q) list = list.filter(f => norm([f.produto, f.codigo, f.marca, (cli(f.clienteId) || {}).nome].join(' ')).includes(q));
+  const qq = norm(S.busca);
+  if (qq) list = list.filter(f => norm([f.produto, f.codigo, f.marca, (cli(f.clienteId) || {}).nome].join(' ')).includes(qq));
   list.sort((a, b) => (ORDEM.indexOf(a.status) - ORDEM.indexOf(b.status)) || (b.atualizadoEm || '').localeCompare(a.atualizadoEm || ''));
-  return `<header style="margin-bottom:16px"><h1>Faltas</h1><p class="sub">Produtos que o cliente pediu e não tinha.</p></header>
+  return `${barra('Faltas')}
   <div class="stack">
     <label class="search">${svg(I.search, 20)}<span class="sr">Buscar faltas</span><input id="buscaF" data-in="busca" type="search" placeholder="Produto, código, marca ou cliente" value="${esc(S.busca)}"></label>
     <div class="chips" role="group" aria-label="Filtrar por situação">${filtros.map(([k, l]) => `<button class="fchip" data-act="filtro" data-f="${k}" aria-pressed="${S.filtro === k}">${l}${k !== 'todas' ? ' · ' + cnt(k) : ''}</button>`).join('')}</div>
@@ -349,15 +474,20 @@ function vFaltas() {
 function vClientes() {
   if (S.cli && cli(S.cli)) return vCliente();
   const fs = faltas();
-  let list = clientes(); const q = norm(S.buscaCli);
-  if (q) list = list.filter(c => norm([c.nome, c.cidade, c.comprador].join(' ')).includes(q));
-  return `<header class="item" style="margin-bottom:16px;align-items:center"><h1>Clientes</h1><button class="btn sm" data-act="novoCli">${svg(I.plus, 18)}Novo</button></header>
+  let list = clientes(); const qq = norm(S.buscaCli);
+  if (qq) list = list.filter(c => norm([c.nome, c.cidade, c.comprador].join(' ')).includes(qq));
+  return `${barra('Clientes')}
   <div class="stack">
     <label class="search">${svg(I.search, 20)}<span class="sr">Buscar cliente</span><input id="buscaC" data-in="buscaCli" type="search" placeholder="Nome, cidade ou comprador" value="${esc(S.buscaCli)}"></label>
     <div class="list">${list.length ? list.map(c => {
       const mine = fs.filter(f => f.clienteId === c.id);
       const d = mine.filter(f => f.status === 'disponivel').length, ab = mine.filter(f => ['aguardando', 'armazenando'].includes(f.status)).length;
-      return `<button class="card linkbtn item" data-act="openCli" data-id="${esc(c.id)}" style="align-items:center"><span style="min-width:0"><span class="t" style="display:block">${esc(c.nome)}</span><span class="m" style="display:block">${esc([c.cidade, c.comprador].filter(Boolean).join(' · ') || 'Sem detalhes')}</span>
+      const dv = diasDesde(c.ultimaVisita); const atr = atraso(c) >= 0;
+      const dias = (c.diasVisita || []).map(i => DIAS[i]).join(', ');
+      return `<button class="card linkbtn item" data-act="openCli" data-id="${esc(c.id)}" style="align-items:center"><span style="min-width:0">
+        <span class="t" style="display:block">${esc(c.nome)}</span>
+        <span class="m" style="display:block">${esc([c.cidade, dias].filter(Boolean).join(' · ') || 'Sem detalhes')}</span>
+        <span class="m" style="display:block;color:${atr ? 'var(--rd)' : 'var(--mu)'}">${dv === null ? 'Sem visita registrada' : dv === 0 ? 'Visitado hoje' : 'Última visita há ' + dv + ' ' + pl(dv, 'dia', 'dias')}</span>
         <span class="row" style="margin-top:6px">${d ? `<span class="chip" style="color:#166534;background:#DCFCE7">${d} ${pl(d, 'disponível', 'disponíveis')}</span>` : ''}${ab ? `<span class="chip" style="color:#374151;background:#E5E7EB">${ab} em aberto</span>` : ''}</span></span>${svg(I.chev, 20)}</button>`;
     }).join('') : `<div class="empty">${clientes().length ? 'Nenhum cliente encontrado.' : 'Nenhum cliente cadastrado ainda.'}</div>`}</div>
   </div>`;
@@ -367,36 +497,47 @@ function vCliente() {
   const c = cli(S.cli); const mine = faltas().filter(f => f.clienteId === c.id);
   const disp = mine.filter(f => f.status === 'disponivel');
   const tel = String(c.telefone || '').replace(/\D/g, '');
-  let h = `<button class="back" data-act="backCli">${svg(I.back, 22)}Clientes</button>
+  const dv = diasDesde(c.ultimaVisita);
+  const peds = pedidos().filter(p => p.clienteId === c.id);
+  let h = `${barra('', 'backCli', `<button class="ibtn" data-act="editCli" data-id="${esc(c.id)}" aria-label="Editar cliente">${svg(I.edit, 22)}</button>`)}
   <section class="card stack" style="gap:10px">
-    <div class="item"><div style="min-width:0"><h1 style="font-size:23px">${esc(c.nome)}</h1>
+    <div><h1 style="font-size:24px">${esc(c.nome)}</h1>
       <p class="sub">${esc([c.cidade, c.comprador ? 'Comprador: ' + c.comprador : ''].filter(Boolean).join(' · '))}</p>
-      ${c.telefone ? `<p class="sub">${esc(c.telefone)}</p>` : ''}</div>
-      <button class="btn sm ghost" data-act="editCli" data-id="${esc(c.id)}">Editar</button></div>
-    <div class="grid2">${tel ? `<a class="btn sm" href="${esc(waLink(c))}" target="_blank" rel="noopener">${svg(I.wa, 18)}WhatsApp</a><a class="btn sm" href="tel:${esc(tel)}">${svg(I.phone, 18)}Ligar</a>` : `<button class="btn sm" data-act="editCli" data-id="${esc(c.id)}">Adicionar telefone</button>`}</div>
+      <p class="sub">${dv === null ? 'Nenhuma visita registrada' : 'Última visita: ' + dm(c.ultimaVisita) + (dv === 0 ? ' (hoje)' : ' (há ' + dv + ' ' + pl(dv, 'dia', 'dias') + ')')}${(c.diasVisita || []).length ? ' · visita: ' + c.diasVisita.map(i => DIAS[i]).join(', ') : ''}</p>
+      ${c.endereco ? `<p class="sub">${esc(c.endereco)}</p>` : ''}${c.telefone ? `<p class="sub">${esc(c.telefone)}</p>` : ''}</div>
+    <div class="grid3">${tel ? `<a class="btn sm" href="${esc(waLink(c))}" target="_blank" rel="noopener">${svg(I.wa, 18)}WhatsApp</a><a class="btn sm" href="tel:${esc(tel)}">${svg(I.phone, 18)}Ligar</a>` : `<button class="btn sm" data-act="editCli" data-id="${esc(c.id)}" style="grid-column:span 2">Adicionar telefone</button>`}<button class="btn sm pri" data-act="registrarVisita" data-id="${esc(c.id)}">${svg(I.check, 18)}Visitei</button></div>
+    <div class="grid2"><button class="btn sm tint" data-act="novaFalta" data-id="${esc(c.id)}">${svg(I.plus, 18)}Registrar falta</button>${PEDIDOS ? `<button class="btn sm tint" data-act="novoPedido" data-id="${esc(c.id)}">${svg(I.cart, 18)}Pedido</button>` : (endCompleto(c) && c.endereco ? `<a class="btn sm tint" href="${esc(mapsBusca(c))}" target="_blank" rel="noopener">${svg(I.route, 18)}Ver no Maps</a>` : `<button class="btn sm tint" data-act="editCli" data-id="${esc(c.id)}">${svg(I.route, 18)}Pôr endereço</button>`)}</div>
   </section>`;
   if (disp.length) h += `<section class="hero stack" style="margin-top:12px;gap:10px"><span class="eyebrow">Ofereça nesta visita</span><h2 style="color:#fff">${disp.length} ${pl(disp.length, 'produto liberado', 'produtos liberados')}</h2><div class="grid2"><a class="btn wa sm" href="${esc(waLink(c, disp, 'disp'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a><button class="btn sm" data-act="ofertarCli" data-id="${esc(c.id)}">Ofereci tudo</button></div></section>`;
-  h += `<div class="stack" style="margin-top:16px">`;
-  if (!mine.length) h += `<div class="empty">Nenhuma falta registrada para este cliente.</div>`;
-  for (const k of ORDEM) {
-    const l = mine.filter(f => f.status === k).sort((a, b) => (b.atualizadoEm || '').localeCompare(a.atualizadoEm || ''));
-    if (!l.length) continue;
-    h += `<span class="eyebrow" style="margin-top:4px">${ST[k].label} · ${l.length}</span>${l.map(f => faltaCard(f, false)).join('')}`;
+  const tabs = [['faltas', `Faltas (${mine.filter(f => !['vendido', 'cancelado'].includes(f.status)).length})`], ['pedidos', `Pedidos (${peds.length})`], ['visitas', 'Visitas e notas']].filter(([k]) => PEDIDOS || k !== 'pedidos');
+  h += `<div class="seg" role="group" aria-label="Seções do cliente" style="margin-top:14px">${tabs.map(([k, l]) => `<button data-act="cliTab" data-t="${k}" aria-pressed="${S.cliTab === k}">${l}</button>`).join('')}</div><div class="stack" style="margin-top:12px">`;
+  if (S.cliTab === 'faltas') {
+    if (!mine.length) h += `<div class="empty">Nenhuma falta registrada para este cliente.</div>`;
+    for (const k of ORDEM) {
+      const l = mine.filter(f => f.status === k).sort((a, b) => (b.atualizadoEm || '').localeCompare(a.atualizadoEm || ''));
+      if (!l.length) continue;
+      h += `<span class="eyebrow" style="margin-top:4px">${ST[k].label} · ${l.length}</span>${l.map(f => faltaCard(f, false)).join('')}`;
+    }
+  } else if (S.cliTab === 'pedidos') {
+    if (!peds.length) h += `<div class="empty">Nenhum pedido anotado para este cliente.</div>`;
+    else { const tot = peds.reduce((s, p) => s + (Number(p.total) || 0), 0); h += `<p class="hint" style="margin:0">${peds.length} ${pl(peds.length, 'pedido', 'pedidos')} · total ${reais(tot)}</p>${peds.map(p => pedidoCard(p, false)).join('')}`; }
+  } else {
+    const vis = (Array.isArray(c.visitas) ? c.visitas : []).slice().reverse();
+    const notas = Array.isArray(c.notas) ? c.notas : [];
+    h += `<span class="eyebrow">Anotações</span>
+      ${notas.map((n, i) => ({ n, i })).reverse().map(({ n, i }) => `<div class="note"><div><small>${dm(n.em)}</small><div style="font-size:14px;line-height:1.45;margin-top:4px;white-space:pre-wrap">${esc(n.txt)}</div></div><button class="ibtn" data-act="delNota" data-i="${i}" aria-label="Apagar anotação">${svg(I.x, 18)}</button></div>`).join('')}
+      <label class="f"><span class="sr">Nova anotação</span><textarea id="notaTxt" data-in="nota" class="inp" placeholder="Ex.: comprador prefere visita na terça; pagamento 28/35 dias">${esc(S.nota)}</textarea></label>
+      <button class="btn" data-act="addNota">Salvar anotação</button>
+      <span class="eyebrow" style="margin-top:8px">Visitas</span>
+      ${vis.length ? `<div class="card" style="padding:4px 14px">${vis.slice(0, 30).map(v => `<div class="line"><span>${new Date(v.em).toLocaleDateString('pt-BR')} ${hm(v.em)}</span><span class="hint" style="text-align:right">${esc(v.obs || '')}</span></div>`).join('')}</div>` : `<div class="empty">Nenhuma visita registrada.</div>`}
+      <button class="btn danger" data-act="delCli" data-id="${esc(c.id)}" style="margin-top:16px">Excluir cliente</button>`;
   }
-  const notas = Array.isArray(c.notas) ? c.notas : [];
-  h += `<span class="eyebrow" style="margin-top:8px">Anotações</span>
-    ${notas.map((n, i) => ({ n, i })).reverse().map(({ n, i }) => `<div class="note"><div><small>${dm(n.em)}</small><div style="font-size:14px;line-height:1.45;margin-top:4px;white-space:pre-wrap">${esc(n.txt)}</div></div><button class="btn sm ghost" data-act="delNota" data-i="${i}" aria-label="Apagar anotação">${svg(I.x, 18)}</button></div>`).join('')}
-    <label class="f"><span class="sr">Nova anotação</span><textarea id="notaTxt" data-in="nota" class="inp" placeholder="Ex.: comprador prefere visita na terça; pagamento 28/35 dias">${esc(S.nota)}</textarea></label>
-    <button class="btn" data-act="addNota">Salvar anotação</button>
-    <button class="btn danger" data-act="delCli" data-id="${esc(c.id)}" style="margin-top:16px">Excluir cliente</button>
-  </div>`;
-  return h;
+  return h + '</div>';
 }
 
 function vChegadas() {
   const im = S.imp;
-  const podeImg = true;
-  let h = `<header style="margin-bottom:16px"><h1>Chegadas</h1><p class="sub">Mande o print do grupo da Ramada. O app lê os códigos e encontra quem estava esperando.</p></header><div class="stack">
+  let h = `${barra('Chegadas')}<p class="sub" style="margin:-4px 0 14px">Mande o print do grupo da Ramada. O app lê os códigos, encontra quem estava esperando e guarda os produtos no catálogo.</p><div class="stack">
   <section class="card stack">
     <span class="eyebrow">1. O que diz o print?</span>
     <div class="seg" role="group" aria-label="Situação dos produtos do print">
@@ -404,49 +545,97 @@ function vChegadas() {
       <button data-act="impStatus" data-s="disponivel" aria-pressed="${im.status === 'disponivel'}">Disponível p/ venda</button>
     </div>
     <span class="eyebrow" style="margin-top:6px">2. Envie o print</span>
-    ${podeImg ? `<label class="btn acc block" style="cursor:pointer">${svg(I.image, 20)}Escolher print(s) da galeria<input id="impFile" type="file" accept="image/*" multiple class="sr"></label><span class="hint">Pode mandar vários prints de uma vez. Dica: no WhatsApp, abra o print, toque em compartilhar e escolha <b>Representante</b>.</span>` : `<p class="hint">Leitura de prints desligada: no Termux, rode <b>pkg install tesseract</b>. Enquanto isso, cole ou digite os códigos abaixo.</p>`}
-    <button class="btn ghost sm" data-act="impTexto" style="align-self:flex-start">${im.mostraTexto || !podeImg ? 'Colar texto' : 'Ou colar texto da mensagem'}</button>
-    ${im.mostraTexto || !podeImg ? `<label class="f"><span class="sr">Texto da mensagem</span><textarea id="impTxt" data-in="impTexto" class="inp" placeholder="Cole aqui a lista (códigos e nomes)">${esc(im.texto)}</textarea></label><button class="btn" data-act="impLerTexto">Ler texto</button>` : ''}
+    <label class="btn pri block" style="cursor:pointer">${svg(I.image, 20)}Escolher print(s) da galeria<input id="impFile" type="file" accept="image/*" multiple class="sr"></label>
+    <span class="hint">Dica: no WhatsApp, abra o print, toque em compartilhar e escolha <b>Representante</b>.</span>
+    <button class="btn ghost sm" data-act="impTexto" style="align-self:flex-start">${im.mostraTexto ? 'Fechar texto' : 'Ou colar/digitar códigos'}</button>
+    ${im.mostraTexto ? `<label class="f"><span class="sr">Texto da mensagem</span><textarea id="impTxt" data-in="impTexto" class="inp" placeholder="Um código por linha, ou cole a lista">${esc(im.texto)}</textarea></label><button class="btn" data-act="impLerTexto">Ler texto</button>` : ''}
   </section>`;
-  if (im.erro) h += `<div class="card" style="border-color:#FCA5A5;background:#FEF2F2"><div class="t" style="color:#991B1B">${esc(im.erro)}</div></div>`;
+  if (im.erro) h += `<div class="card" style="border-color:#F1B4B4;background:#FEF2F2"><div class="t" style="color:#991B1B">${esc(im.erro)}</div></div>`;
   if (im.fase === 'lendo') h += `<div class="card row" style="gap:12px"><span class="spin"></span><span>${esc(im.progresso || 'Lendo o print…')}</span></div>`;
   if ((im.fase === 'pronto' || im.fase === 'salvando') && im.res) {
     const { exatos, possiveis, marcas } = im.match; const r = im.res; const nSel = im.sel.size;
+    const novos = r.produtos.filter(p => normCode(p.codigo) && !prodPorCodigo(p.codigo)).length;
     const linha = (x, extra) => { const c = cli(x.f.clienteId) || {}; return `<label class="check"><input type="checkbox" data-chk="${x.f.id}" ${im.sel.has(x.f.id) ? 'checked' : ''}><span><span class="t" style="display:block">${esc(x.f.produto || x.f.codigo)}</span><span class="m" style="display:block">${esc(c.nome || '')}${x.f.codigo ? ' · cód. ' + esc(x.f.codigo) : ''} · ${ST[x.f.status].label} → <b>${ST[im.status].label}</b></span>${extra ? `<span class="m" style="display:block">${extra}</span>` : ''}</span></label>`; };
-    h += `<section class="card stack" style="gap:6px"><span class="eyebrow">3. Resultado</span><p class="sub" style="margin:0">Li ${r.produtos.length} ${pl(r.produtos.length, 'produto', 'produtos')}${r.marcas.length ? ' e ' + r.marcas.length + ' ' + pl(r.marcas.length, 'marca', 'marcas') : ''} · marcar como <b>${ST[im.status].label}</b>.</p>`;
+    h += `<section class="card stack" style="gap:6px"><span class="eyebrow">3. Resultado</span><p class="sub" style="margin:0">Li ${r.produtos.length} ${pl(r.produtos.length, 'produto', 'produtos')}${r.marcas.length ? ' e ' + r.marcas.length + ' ' + pl(r.marcas.length, 'marca', 'marcas') : ''} · marcar como <b>${ST[im.status].label}</b>.${novos ? ` <b>${novos}</b> ${pl(novos, 'produto novo vai', 'produtos novos vão')} para o catálogo.` : ''}</p>`;
     if (exatos.length) h += `<div class="t" style="margin-top:10px;color:#166534">Suas faltas neste print (pelo código) · ${exatos.length}</div>${exatos.map(x => linha(x)).join('')}`;
     if (possiveis.length) h += `<div class="t" style="margin-top:10px">Talvez sejam (pelo nome) · confira</div>${possiveis.map(x => linha(x, 'No print: ' + esc(x.p.descricao + ' ' + (x.p.complemento || '')))).join('')}`;
     if (marcas.length) h += `<div class="t" style="margin-top:10px">Chegou a marca, confira se é o item</div>${marcas.map(x => linha(x, 'Marca no print: ' + esc(x.m))).join('')}`;
     if (!exatos.length && !possiveis.length && !marcas.length) h += `<p class="empty" style="padding:12px 0">Nenhuma das suas faltas em aberto aparece neste print.</p>`;
-    h += `<div class="stack" style="margin-top:10px;gap:8px"><button class="btn pri block" data-act="impAplicar" ${im.fase === 'salvando' ? 'disabled' : ''}>${im.fase === 'salvando' ? 'Salvando…' : nSel ? `Atualizar ${nSel} ${pl(nSel, 'falta', 'faltas')}` : 'Registrar chegada sem atualizar'}</button><button class="btn ghost" data-act="impLimpar">Descartar</button></div>
+    h += `<div class="stack" style="margin-top:10px;gap:8px"><button class="btn pri block" data-act="impAplicar" ${im.fase === 'salvando' ? 'disabled' : ''}>${im.fase === 'salvando' ? 'Salvando…' : nSel ? `Atualizar ${nSel} ${pl(nSel, 'falta', 'faltas')}` : 'Registrar chegada'}</button><button class="btn ghost" data-act="impLimpar">Descartar</button></div>
     <details><summary>Ver tudo que foi lido</summary><div style="font-size:13px;line-height:1.6;color:var(--mu)">${r.produtos.map(p => `${esc(p.codigo)} – ${esc(p.descricao)} ${esc(p.complemento || '')}`).join('<br>')}${r.marcas.length ? (r.produtos.length ? '<br><br>' : '') + 'Marcas: ' + r.marcas.map(esc).join(', ') : ''}</div></details>
     ${r.texto ? `<details><summary>Texto bruto da leitura</summary><pre style="font-size:12px;white-space:pre-wrap;color:var(--mu);margin:0">${esc(r.texto)}</pre></details>` : ''}
-    <p class="hint" style="margin:0">Confira se os códigos batem com o print. Se faltou algum, cole ou digite em “Colar texto”.</p></section>`;
+    <p class="hint" style="margin:0">Confira se os códigos batem com o print. Se faltou algum, use “colar/digitar códigos”.</p></section>`;
   }
   const hs = imps().slice(0, 8);
-  if (hs.length) h += `<section class="card stack" style="gap:0"><span class="eyebrow" style="margin-bottom:6px">Últimas chegadas registradas</span>${hs.map(x => `<div class="cliline"><span>${dm(x.em)} ${hm(x.em)} · ${ST[x.status] ? ST[x.status].label : ''}</span><span class="hint">${x.nProd ? x.nProd + ' prod.' : ''}${x.nMarcas ? ' ' + x.nMarcas + ' marcas' : ''} · ${x.atualizadas || 0} atualiz.</span></div>`).join('')}</section>`;
+  if (hs.length) h += `<section class="card stack" style="gap:0"><span class="eyebrow" style="margin-bottom:6px">Últimas chegadas registradas</span>${hs.map(x => `<div class="line"><span>${dm(x.em)} ${hm(x.em)} · ${ST[x.status] ? ST[x.status].label : ''}</span><span class="hint">${x.nProd ? x.nProd + ' prod.' : ''}${x.nMarcas ? ' ' + x.nMarcas + ' marcas' : ''} · ${x.atualizadas || 0} atualiz.</span></div>`).join('')}</section>`;
   return h + '</div>';
 }
 
 function vMais() {
-  const on = srv.online;
-  const auto = on && srv.onedrive;
+  if (S.sub === 'pedidos') return vPedidos();
+  if (S.sub === 'catalogo') return vCatalogo();
+  if (S.sub === 'backup') return vBackup();
+  if (S.sub === 'mensagens') return vMensagens();
+  if (S.sub === 'config') return vConfig();
+  const pm = pedidos();
+  const row = (sub, ic, t, d) => `<button class="linkbtn" data-act="sub" data-s="${sub}"><span class="mic">${svg(ic, 22)}</span><span style="flex:1;min-width:0"><span class="t" style="display:block">${t}</span><span class="m" style="display:block">${d}</span></span>${svg(I.chev, 20)}</button>`;
+  const uc = ultimaCopia();
+  return `${barra('Mais')}<div class="stack"><section class="card menu" style="padding:4px 16px">
+    ${!PEDIDOS ? '' : row('pedidos', I.cart, 'Pedidos', `${pm.length} ${pl(pm.length, 'pedido', 'pedidos')} · ${pm.filter(p => sameMonth(p.em)).length} neste mês`)}
+    ${row('catalogo', I.book, 'Catálogo Ramada', `${produtos().length} produtos conhecidos`)}
+    ${row('backup', I.cloud, 'Backup e OneDrive', `Última cópia: ${uc ? dm(uc) + ' ' + hm(uc) : 'nunca'}`)}
+    ${row('mensagens', I.msg, 'Mensagens do WhatsApp', 'Textos dos avisos aos clientes')}
+    ${row('config', I.gear, 'Visitas', `Frequência padrão: a cada ${Number(cfg().freq) || 14} dias`)}
+  </section>
+  <section class="card stack" style="gap:6px"><span class="t">Representante · versão ${VERSAO}</span>
+    <p class="hint" style="margin:0">${clientes().length} clientes · ${faltas().length} faltas · ${produtos().length} produtos no catálogo · Termux: ${srv.online ? 'ligado' : 'desligado'}</p>
+    <details><summary>Novidades das versões 1.4 e 1.5</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+      <li>1.5: pedidos saíram (ficam no Mercos)</li>
+      <li>1.5: atalhos “Copiar código” e “Tem no Mercos” em cada falta</li>
+      <li>1.5: endereço do cliente, rota do dia no Maps e roteiro de amanhã</li>
+      <li>Visual novo em verde oliva, com cara de app</li>
+      <li>Catálogo Ramada: digitou o código, o produto aparece. Aprende com cada print</li>
+      <li>Roteiro do dia e aviso de clientes sem visita</li>
+      <li>Resumo do mês e mensagens do WhatsApp editáveis</li></ul></details></section></div>`;
+}
+
+function vPedidos() {
+  const ps = pedidos(); const tot = ps.filter(p => sameMonth(p.em)).reduce((s, p) => s + (Number(p.total) || 0), 0);
+  return `${barra('Pedidos', 'subVoltar', `<button class="ibtn" data-act="csvPedidos" aria-label="Exportar planilha de pedidos">${svg(I.cloud, 22)}</button>`)}
+  <div class="stack"><div class="card item"><div><span class="eyebrow">Este mês</span><div class="money" style="font-size:24px;margin-top:4px">${reais(tot)}</div></div><div class="hint" style="text-align:right">${ps.filter(p => sameMonth(p.em)).length} ${pl(ps.filter(p => sameMonth(p.em)).length, 'pedido', 'pedidos')}</div></div>
+  <div class="list">${ps.length ? ps.map(p => pedidoCard(p)).join('') : `<div class="empty">Nenhum pedido anotado.<br>Anote pelo botão “Novo pedido” ou na ficha do cliente.</div>`}</div></div>`;
+}
+
+function vCatalogo() {
+  let ps = produtos(); const qq = norm(S.buscaCat);
+  if (qq) { const tk = qq.split(' '); ps = ps.filter(p => { const n = norm([p.codigo, p.descricao, p.marca].join(' ')); return tk.every(t => n.includes(t)); }); }
+  ps.sort((a, b) => norm(a.descricao).localeCompare(norm(b.descricao)));
+  const mostra = ps.slice(0, 150);
+  return `${barra('Catálogo', 'subVoltar')}<p class="sub" style="margin:-4px 0 14px">O app aprende os produtos a cada print de chegada. Ao registrar uma falta ou pedido, digite só o código.</p>
+  <div class="stack"><label class="search">${svg(I.search, 20)}<span class="sr">Buscar produto</span><input id="buscaCat" data-in="buscaCat" type="search" placeholder="Código, nome ou marca" value="${esc(S.buscaCat)}"></label>
+  <div class="card" style="padding:4px 16px">${mostra.length ? mostra.map(p => `<button class="linkbtn line" data-act="editProduto" data-id="${esc(p.id)}"><span style="min-width:0"><span class="t" style="display:block">${esc(p.descricao)}</span><span class="m" style="display:block">Cód. ${esc(p.codigo)}${p.marca ? ' · ' + esc(p.marca) : ''}${p.preco ? ' · ' + reais(p.preco) : ''}</span></span>${svg(I.chev, 18)}</button>`).join('') : `<div class="empty">${produtos().length ? 'Nada encontrado.' : 'Catálogo vazio. Mande um print de chegada para começar.'}</div>`}</div>
+  ${ps.length > 150 ? `<p class="hint">Mostrando 150 de ${ps.length}. Use a busca.</p>` : ''}</div>`;
+}
+
+function vBackup() {
+  const on = srv.online; const auto = on && srv.onedrive;
   const st = auto ? (srv.erroSync ? ['Com problema', '#991B1B', '#FEE2E2'] : ['Automático', '#166534', '#DCFCE7']) : on ? ['Não configurado', '#92400E', '#FEF3C7'] : ['Termux desligado', '#374151', '#E5E7EB'];
   const uc = ultimaCopia();
-  return `<header style="margin-bottom:16px"><h1>Backup</h1><p class="sub">Seus dados ficam guardados neste celular. Com o Termux ligado, cada alteração vai sozinha para a pasta <b>RepresentanteApp</b> do OneDrive. Com ele desligado, use o botão de enviar.</p></header>
+  return `${barra('Backup', 'subVoltar')}<p class="sub" style="margin:-4px 0 14px">Seus dados ficam guardados neste celular. Com o Termux ligado (<b>rep</b>), cada alteração vai sozinha para a pasta <b>RepresentanteApp</b> do OneDrive.</p>
   <div class="stack">
     <section class="card stack">
       <div class="item"><span class="t">Cópia no OneDrive</span><span class="chip" style="color:${st[1]};background:${st[2]}">${st[0]}</span></div>
       <p class="hint" style="margin:0">Última cópia: ${uc ? dm(uc) + ' ' + hm(uc) : 'nunca'}${meta.pendente ? ' · há alterações ainda não copiadas' : ''}</p>
       ${auto && srv.erroSync ? `<p class="hint" style="margin:0;color:#991B1B">${esc(srv.erroSync)}</p>` : ''}
       ${auto ? `<button class="btn pri" data-act="syncAgora">Enviar agora</button>` : ''}
-      ${on && !srv.onedrive ? `<p class="hint" style="margin:0">Para ligar o envio automático: no Termux, digite <b>rep-onedrive</b> e siga os passos.</p>` : ''}
+      ${on && !srv.onedrive ? `<p class="hint" style="margin:0">Para ligar o envio automático: no Termux, digite <b>rep-onedrive</b>.</p>` : ''}
       ${!on ? `<p class="hint" style="margin:0">Para envio automático, abra o Termux e digite <b>rep</b>. Se o Termux estiver ligado e mesmo assim aparecer desligado, libere <b>Rede local</b> nas permissões deste site no Chrome. Ou envie agora:</p>` : ''}
       <button class="btn ${auto ? '' : 'pri'}" data-act="compartilhar">Enviar backup (escolha OneDrive)</button>
     </section>
     <section class="card stack">
-      <span class="t">Baixar arquivos</span>
-      <button class="btn" data-act="baixarCsv">Planilha de faltas (.csv)</button>
+      <span class="t">Planilhas</span>
+      <button class="btn" data-act="baixarCsv">Faltas (.csv)</button>
+      ${pedidos().length ? `<button class="btn" data-act="csvPedidos">Pedidos antigos (.csv)</button>` : ''}
       <button class="btn" data-act="baixarJson">Backup completo (.json)</button>
     </section>
     <section class="card stack">
@@ -454,18 +643,29 @@ function vMais() {
       <p class="hint" style="margin:0">Use em um celular novo. Os registros do backup substituem os de mesmo nome; nada é apagado.</p>
       ${auto ? `<button class="btn" data-act="restOne">Restaurar do OneDrive</button>` : ''}
       <label class="btn" style="cursor:pointer">Restaurar de um arquivo .json<input id="restFile" type="file" accept=".json,application/json" class="sr"></label>
-      ${on && srv.temAntigo && !items.size ? `<button class="btn" data-act="importAntigo">Trazer dados da versão 1.1</button>` : ''}
-    </section>
-    <section class="card stack" style="gap:6px">
-      <span class="t">Versão ${VERSAO}</span>
-      <p class="hint" style="margin:0">${clientes().length} clientes · ${faltas().length} faltas · ${imps().length} chegadas · Termux: ${on ? 'ligado' : 'desligado'}</p>
-      <details><summary>Novidades das versões 1.2 e 1.3</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
-        <li>Publicado no GitHub: instala como app de verdade e não depende do Termux</li>
-        <li>Instalado como app: abre mesmo com o Termux fechado</li>
-        <li>Receba prints direto do WhatsApp pelo botão compartilhar</li>
-        <li>Cópia automática no OneDrive quando o Termux está ligado; botão de envio quando não está</li></ul></details>
+      ${on && srv.temAntigo && clientes().length === 0 ? `<button class="btn" data-act="importAntigo">Trazer dados da versão 1.1</button>` : ''}
     </section>
   </div>`;
+}
+
+function vMensagens() {
+  const c = cfg();
+  return `${barra('Mensagens', 'subVoltar')}<p class="sub" style="margin:-4px 0 14px">Textos usados no botão “Avisar”. Use <b>{comprador}</b> para o primeiro nome do comprador, <b>{loja}</b> para o nome da loja e <b>{lista}</b> para a lista de produtos.</p>
+  <form class="stack" data-form="mensagens">
+    <label class="f">Quando está disponível<textarea name="msgDisp" class="inp" style="min-height:150px">${esc(c.msgDisp || MSG_DISP)}</textarea></label>
+    <label class="f">Quando está armazenando<textarea name="msgArm" class="inp" style="min-height:150px">${esc(c.msgArm || MSG_ARM)}</textarea></label>
+    <button class="btn pri" type="submit">Salvar mensagens</button>
+    <button class="btn ghost" type="button" data-act="msgPadrao">Voltar ao texto padrão</button>
+  </form>`;
+}
+
+function vConfig() {
+  const f = Number(cfg().freq) || 14;
+  return `${barra('Visitas', 'subVoltar')}<p class="sub" style="margin:-4px 0 14px">De quanto em quanto tempo cada cliente deve ser visitado. Clientes acima desse prazo aparecem em “Precisam de visita”. Dá para mudar por cliente na ficha dele.</p>
+  <form class="stack card" data-form="config">
+    <label class="f">Frequência padrão<select name="freq" class="inp">${[7, 14, 21, 30, 45, 60].map(n => `<option value="${n}" ${n === f ? 'selected' : ''}>A cada ${n} dias</option>`).join('')}</select></label>
+    <button class="btn pri" type="submit">Salvar</button>
+  </form>`;
 }
 
 /* ---------- modais ---------- */
@@ -473,32 +673,40 @@ function openModal(m) { S.modal = m; renderModal(); }
 function closeModal() { S.modal = null; renderModal(); }
 function renderModal() {
   const m = S.modal; const el = $('#modal');
+  const a = document.activeElement; const fid = a && a.id && a.closest && a.closest('#modal') ? a.id : null; let pos = null;
+  try { pos = a.selectionStart; } catch (e) { }
+  const sc = el.querySelector('.sheet') ? el.querySelector('.sheet').scrollTop : 0;
   if (!m) { el.innerHTML = ''; return; }
-  const head = t => `<div class="sheethead"><h2>${t}</h2><button type="button" class="btn ghost sm" data-act="closeModal" aria-label="Fechar">${svg(I.x, 22)}</button></div>`;
+  const head = t => `<div class="handle"></div><div class="sheethead"><h2>${t}</h2><button type="button" class="ibtn" data-act="closeModal" aria-label="Fechar">${svg(I.x, 22)}</button></div>`;
   let inner = '';
   if (m.type === 'falta') {
     const f = m.id ? items.get(m.id) || {} : {};
     const cid = f.clienteId || m.clienteId || '';
-    const marcas = [...new Set([...faltas().map(x => x.marca), ...imps().flatMap(x => x.marcas || [])].filter(Boolean))].slice(0, 200);
+    const marcas = [...new Set([...faltas().map(x => x.marca), ...produtos().map(x => x.marca), ...imps().flatMap(x => x.marcas || [])].filter(Boolean))].slice(0, 300);
     inner = `<form class="sheet stack" data-form="falta" style="gap:14px">${head(m.id ? 'Editar falta' : 'Registrar falta')}
       <label class="f">Cliente<select name="clienteId" class="inp"><option value="">Escolha…</option>${clientes().map(c => `<option value="${esc(c.id)}" ${c.id === cid ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</select></label>
-      <label class="f">Ou cliente novo<input name="novoCliente" class="inp" placeholder="Nome da loja (se não estiver na lista)"></label>
-      <label class="f">Código Ramada<input name="codigo" class="inp" inputmode="numeric" placeholder="Ex.: 31331" value="${esc(f.codigo || '')}"><span class="hint">É pelo código que o app reconhece a chegada no print.</span></label>
-      <label class="f">Produto<input name="produto" class="inp" placeholder="Ex.: Tubo soldável 3 m - 25 mm" value="${esc(f.produto || '')}"></label>
+      ${cid ? '' : `<label class="f">Ou cliente novo<input name="novoCliente" class="inp" placeholder="Nome da loja (se não estiver na lista)"></label>`}
+      <label class="f">Código Ramada<input name="codigo" class="inp" inputmode="numeric" placeholder="Ex.: 31331" value="${esc(f.codigo || '')}" autocomplete="off"><span class="hint" id="codHint">${produtos().length ? 'Digite o código: o produto vem do catálogo.' : 'É pelo código que o app reconhece a chegada no print.'}</span></label>
+      <label class="f">Produto<input name="produto" class="inp" placeholder="Nome ou parte do nome" value="${esc(f.produto || '')}" autocomplete="off"></label>
+      <div id="sugProd"></div>
       <div class="grid2"><label class="f">Marca<input name="marca" class="inp" list="dlMarcas" placeholder="Ex.: Tigre" value="${esc(f.marca || '')}"></label>
       <label class="f">Quantidade<input name="qtd" class="inp" type="number" min="0" inputmode="numeric" value="${esc(f.qtd ?? '')}"></label></div>
       <datalist id="dlMarcas">${marcas.map(x => `<option value="${esc(x)}"></option>`).join('')}</datalist>
       <label class="f">Situação<select name="status" class="inp">${ORDEM.map(k => `<option value="${k}" ${(f.status || 'aguardando') === k ? 'selected' : ''}>${ST[k].label}</option>`).join('')}</select></label>
       <label class="f">Observação<textarea name="obs" class="inp" placeholder="Ex.: aceita outra marca; precisa até dia 25">${esc(f.obs || '')}</textarea></label>
-      <button class="btn acc block" type="submit">Salvar falta</button></form>`;
+      <button class="btn pri block" type="submit">Salvar falta</button></form>`;
   } else if (m.type === 'cliente') {
     const c = m.id ? items.get(m.id) || {} : {};
+    const dv = c.diasVisita || [];
     inner = `<form class="sheet stack" data-form="cliente" style="gap:14px">${head(m.id ? 'Editar cliente' : 'Novo cliente')}
       <label class="f">Nome da loja<input name="nome" class="inp" required value="${esc(c.nome || '')}"></label>
-      <label class="f">Cidade / bairro<input name="cidade" class="inp" value="${esc(c.cidade || '')}"></label>
+      <label class="f">Endereço<input name="endereco" class="inp" placeholder="Rua, número, bairro" value="${esc(c.endereco || '')}" autocomplete="street-address"><span class="hint">Usado para abrir a rota do dia no Maps.</span></label>
+      <label class="f">Cidade<input name="cidade" class="inp" value="${esc(c.cidade || '')}"></label>
       <label class="f">Comprador<input name="comprador" class="inp" value="${esc(c.comprador || '')}"></label>
       <label class="f">Telefone / WhatsApp<input name="telefone" class="inp" type="tel" inputmode="tel" placeholder="(00) 00000-0000" value="${esc(c.telefone || '')}"></label>
-      <button class="btn acc block" type="submit">Salvar cliente</button></form>`;
+      <fieldset style="border:0;margin:0;padding:0" class="stack"><legend class="f" style="font-size:14px;font-weight:600;margin-bottom:6px">Dias de visita</legend><div class="days">${DIAS.map((d, i) => `<label><input type="checkbox" name="dia" value="${i}" ${dv.includes(i) ? 'checked' : ''}><span>${d}</span></label>`).join('')}</div></fieldset>
+      <label class="f">Visitar a cada<select name="freq" class="inp"><option value="">Padrão (${Number(cfg().freq) || 14} dias)</option>${[7, 14, 21, 30, 45, 60].map(n => `<option value="${n}" ${Number(c.freq) === n ? 'selected' : ''}>${n} dias</option>`).join('')}</select></label>
+      <button class="btn pri block" type="submit">Salvar cliente</button></form>`;
   } else if (m.type === 'faltaMenu') {
     const f = items.get(m.id); if (!f) { S.modal = null; el.innerHTML = ''; return; }
     const c = cli(f.clienteId) || {};
@@ -507,21 +715,88 @@ function renderModal() {
       <button class="btn" data-act="editFalta" data-id="${f.id}">Editar</button>
       <button class="btn danger" data-act="delFalta" data-id="${f.id}">Excluir falta</button>
       ${Array.isArray(f.hist) && f.hist.length ? `<details><summary>Histórico</summary><div class="hint" style="line-height:1.7">${f.hist.slice().reverse().map(x => `${dm(x.em)} ${hm(x.em)} · ${ST[x.s] ? ST[x.s].label : x.s}${x.via === 'print' ? ' (print)' : ''}`).join('<br>')}</div></details>` : ''}</div>`;
+  } else if (m.type === 'pedido') {
+    const p = m.id ? items.get(m.id) || {} : {};
+    const cid = m.clienteId || p.clienteId || '';
+    const tot = m.linhas.reduce((s, l) => s + (Number(l.qtd) || 0) * numBR(l.preco), 0);
+    inner = `<form class="sheet stack" data-form="pedido" style="gap:12px">${head(m.id ? 'Editar pedido' : 'Novo pedido')}
+      <label class="f">Cliente<select name="clienteId" class="inp" required><option value="">Escolha…</option>${clientes().map(c => `<option value="${esc(c.id)}" ${c.id === cid ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</select></label>
+      <span class="eyebrow">Itens</span>
+      ${m.linhas.map((l, i) => `<div class="pl"><div class="item" style="align-items:center"><span class="hint">Item ${i + 1}</span>${m.linhas.length > 1 ? `<button type="button" class="ibtn" data-act="plDel" data-i="${i}" aria-label="Remover item ${i + 1}">${svg(I.x, 18)}</button>` : ''}</div>
+        <input id="pl-${i}-codigo" data-pl="${i}:codigo" class="inp" inputmode="numeric" placeholder="Código Ramada" value="${esc(l.codigo)}" aria-label="Código do item ${i + 1}" autocomplete="off">
+        <input id="pl-${i}-produto" data-pl="${i}:produto" class="inp" placeholder="Produto" value="${esc(l.produto)}" aria-label="Produto do item ${i + 1}" autocomplete="off">
+        <div class="grid2"><label class="f" style="font-weight:500">Qtd<input id="pl-${i}-qtd" data-pl="${i}:qtd" class="inp" type="number" min="0" inputmode="numeric" value="${esc(l.qtd)}"></label><label class="f" style="font-weight:500">Preço un. (R$)<input id="pl-${i}-preco" data-pl="${i}:preco" class="inp" inputmode="decimal" placeholder="0,00" value="${esc(l.preco)}"></label></div></div>`).join('')}
+      <button type="button" class="btn tint" data-act="plAdd">${svg(I.plus, 18)}Adicionar item</button>
+      <div class="item card" style="padding:12px 16px;align-items:center"><span class="t">Total</span><span class="money" id="pedTotal" style="font-size:20px">${reais(tot)}</span></div>
+      <label class="f">Situação<select name="status" class="inp">${Object.keys(STP).map(k => `<option value="${k}" ${(p.status || 'anotado') === k ? 'selected' : ''}>${STP[k].label}</option>`).join('')}</select></label>
+      <label class="f">Observação<textarea name="obs" class="inp" placeholder="Ex.: prazo 28/35, entregar na terça">${esc(p.obs || '')}</textarea></label>
+      <button class="btn pri block" type="submit">Salvar pedido</button></form>`;
+  } else if (m.type === 'pedidoMenu') {
+    const p = items.get(m.id); if (!p) { S.modal = null; el.innerHTML = ''; return; }
+    const c = cli(p.clienteId) || {};
+    inner = `<div class="sheet stack">${head('Pedido · ' + dm(p.em))}<p class="sub" style="margin-top:-6px">${esc(c.nome || '')}</p>
+      <div class="card" style="padding:4px 14px">${(p.itens || []).map(it => `<div class="line"><span style="min-width:0">${it.qtd}x ${esc(it.produto || '')}${it.codigo ? ' <span class="hint">· ' + esc(it.codigo) + '</span>' : ''}</span><span class="hint">${it.preco ? reais(it.qtd * it.preco) : ''}</span></div>`).join('')}<div class="line"><b>Total</b><span class="money">${reais(p.total)}</span></div></div>
+      ${p.obs ? `<p class="hint" style="margin:0">Obs.: ${esc(p.obs)}</p>` : ''}
+      <span class="eyebrow">Situação</span><div class="seg">${Object.keys(STP).map(k => `<button data-act="pedSt" data-id="${p.id}" data-s="${k}" aria-pressed="${p.status === k}">${STP[k].label}</button>`).join('')}</div>
+      <div class="grid2"><a class="btn wa" href="${esc(waUrl(null, textoPedido(p)))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Enviar</a><button class="btn" data-act="editPedido" data-id="${p.id}">Editar</button></div>
+      <button class="btn danger" data-act="delPedido" data-id="${p.id}">Excluir pedido</button></div>`;
+  } else if (m.type === 'roteiro') {
+    const sel = m.sel; const hojeD = (new Date().getDay() + (m.dia === 1 ? 1 : 0)) % 7;
+    const outros = clientes().filter(c => !sel.includes(c.id)).map(c => ({ c, dia: (c.diasVisita || []).includes(hojeD), at: atraso(c) })).sort((a, b) => (b.dia - a.dia) || (b.at - a.at));
+    inner = `<div class="sheet stack">${head('Roteiro')}
+      <div class="seg" role="group" aria-label="Dia do roteiro"><button data-act="rotDia" data-d="0" aria-pressed="${!m.dia}">Hoje</button><button data-act="rotDia" data-d="1" aria-pressed="${m.dia === 1}">Amanhã (${DIAS[(new Date().getDay() + 1) % 7]})</button></div>
+      <span class="eyebrow">Na ordem da visita · ${sel.length}</span>
+      ${sel.length ? `<div class="card" style="padding:4px 12px">${sel.map((id, i) => { const c = cli(id); return c ? `<div class="line"><span class="num">${i + 1}</span><span class="t" style="flex:1;min-width:0">${esc(c.nome)}</span><button class="ibtn" data-act="rotUp" data-i="${i}" aria-label="Subir" ${i === 0 ? 'disabled' : ''}>${svg(I.up, 20)}</button><button class="ibtn" data-act="rotDown" data-i="${i}" aria-label="Descer" ${i === sel.length - 1 ? 'disabled' : ''}>${svg(I.down, 20)}</button><button class="ibtn" data-act="rotTirar" data-i="${i}" aria-label="Tirar do roteiro">${svg(I.x, 20)}</button></div>` : ''; }).join('')}</div>` : `<p class="hint" style="margin:0">Toque nos clientes abaixo para incluir.</p>`}
+      <span class="eyebrow" style="margin-top:6px">Adicionar</span>
+      <div class="card" style="padding:4px 12px">${outros.length ? outros.map(({ c, dia, at }) => `<button class="linkbtn line" data-act="rotPor" data-id="${esc(c.id)}"><span style="min-width:0"><span class="t" style="display:block">${esc(c.nome)}</span><span class="m" style="display:block">${[dia ? 'Dia de visita' : '', at >= 0 ? (c.ultimaVisita ? 'Atrasado ' + at + ' ' + pl(at, 'dia', 'dias') : 'Sem visita registrada') : '', c.cidade || ''].filter(Boolean).join(' · ')}</span></span>${svg(I.plus, 20)}</button>`).join('') : `<p class="hint">Todos os clientes já estão no roteiro.</p>`}</div>
+      <button class="btn pri block" data-act="rotSalvar">Salvar roteiro</button></div>`;
+  } else if (m.type === 'visita') {
+    const c = cli(m.id) || {};
+    inner = `<form class="sheet stack" data-form="visita">${head('Visita · ' + esc(c.nome || ''))}
+      <label class="f">Como foi? (opcional)<textarea name="obs" class="inp" placeholder="Ex.: fez pedido; pediu catálogo de fechaduras"></textarea></label>
+      <button class="btn pri block" type="submit">${svg(I.check, 18)}Registrar visita de hoje</button></form>`;
+  } else if (m.type === 'produto') {
+    const p = m.id ? items.get(m.id) || {} : {};
+    inner = `<form class="sheet stack" data-form="produto" style="gap:14px">${head(m.id ? 'Produto do catálogo' : 'Adicionar produto')}
+      <label class="f">Código Ramada<input name="codigo" class="inp" inputmode="numeric" required value="${esc(p.codigo || '')}" ${m.id ? 'readonly' : ''}></label>
+      <label class="f">Descrição<input name="descricao" class="inp" required value="${esc(p.descricao || '')}"></label>
+      <div class="grid2"><label class="f">Marca<input name="marca" class="inp" value="${esc(p.marca || '')}"></label><label class="f">Último preço (R$)<input name="preco" class="inp" inputmode="decimal" value="${esc(fmtNum(p.preco))}"></label></div>
+      <button class="btn pri block" type="submit">Salvar</button>
+      ${m.id ? `<button class="btn danger" type="button" data-act="delProduto" data-id="${esc(m.id)}">Tirar do catálogo</button>` : ''}</form>`;
   } else if (m.type === 'confirm') {
     inner = `<div class="sheet stack">${head('Tem certeza?')}<p class="sub" style="margin:0">${esc(m.text)}</p><div class="grid2"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn dangerfill" data-act="confirmYes">${esc(m.ok || 'Excluir')}</button></div></div>`;
   } else if (m.type === 'restore') {
     const txt = m.origem === 'onedrive' ? 'Vou buscar a última cópia (dados-atual.json) da pasta RepresentanteApp do seu OneDrive.' : m.origem === 'antigo' ? 'Vou trazer os clientes e faltas salvos pela versão 1.1 no Termux.' : `O arquivo tem ${(m.data.itens || []).length} registros${m.data.exportadoEm ? ', salvo em ' + dm(m.data.exportadoEm) : ''}.`;
     inner = `<div class="sheet stack">${head('Restaurar backup')}<p class="sub" style="margin:0">${txt} Registros iguais são substituídos e nada é apagado.</p><div class="grid2"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn pri" data-act="restoreYes">Restaurar</button></div></div>`;
   }
+  const novo = !el.firstChild;
   el.innerHTML = `<div class="ovl" data-ovl="1">${inner}</div>`;
-  const first = el.querySelector('input,select,textarea'); if (first && m.type === 'cliente') first.focus();
+  const sh = el.querySelector('.sheet');
+  if (!novo && sh) { sh.style.animation = 'none'; el.firstChild.style.animation = 'none'; sh.scrollTop = sc; }
+  if (fid) { const f2 = document.getElementById(fid); if (f2) { f2.focus(); if (pos != null) try { f2.setSelectionRange(pos, pos); } catch (e) { } } }
+  else if (novo && m.type === 'cliente') { const first = el.querySelector('input'); if (first) first.focus(); }
+}
+
+/* ---------- catálogo: autopreenchimento ---------- */
+function buscaProdutos(txt, n = 6) {
+  const tk = norm(txt).split(' ').filter(Boolean); if (!tk.length) return [];
+  const out = [];
+  for (const p of produtos()) { const s = norm(p.codigo + ' ' + p.descricao + ' ' + (p.marca || '')); if (tk.every(t => s.includes(t))) { out.push(p); if (out.length >= n) break; } }
+  return out;
+}
+function formFalta() { return document.querySelector('form[data-form="falta"]'); }
+function preencherFalta(p) {
+  const f = formFalta(); if (!f || !p) return;
+  f.codigo.value = p.codigo; f.produto.value = p.descricao; if (!f.marca.value && p.marca) f.marca.value = p.marca;
+  const sg = $('#sugProd'); if (sg) sg.innerHTML = '';
+  const hh = $('#codHint'); if (hh) hh.textContent = 'Produto preenchido pelo catálogo.';
 }
 
 /* ---------- chegadas: leitura e cruzamento ---------- */
 function limpar(r) {
-  const produtos = (Array.isArray(r && r.produtos) ? r.produtos : []).map(p => ({ codigo: String(p.codigo ?? '').trim(), descricao: String(p.descricao ?? '').trim(), complemento: String(p.complemento ?? '').trim() })).filter(p => p.codigo || p.descricao);
+  const produtos2 = (Array.isArray(r && r.produtos) ? r.produtos : []).map(p => ({ codigo: String(p.codigo ?? '').trim(), descricao: String(p.descricao ?? '').trim(), complemento: String(p.complemento ?? '').trim() })).filter(p => p.codigo || p.descricao);
   const ms = (Array.isArray(r && r.marcas) ? r.marcas : []).map(m => typeof m === 'string' ? m : (m && (m.parceiro || m.nome)) || '').map(s => String(s).trim()).filter(Boolean);
-  return { produtos, marcas: [...new Set(ms)] };
+  return { produtos: produtos2, marcas: [...new Set(ms)] };
 }
 function nomeBate(a, b) {
   const ta = norm(a).split(' ').filter(t => t.length >= 2); if (ta.length < 2) return false;
@@ -546,17 +821,6 @@ function casar(res, status) {
     if (m) marcas.push({ f, m });
   }
   return { exatos, possiveis, marcas };
-}
-function msgErro(code) {
-  return ({
-    not_granted: 'Você não permitiu que o app use o Claude. Abra o app de novo e permita para ler os prints.',
-    sampling_disabled: 'O Claude não está disponível para esta conta agora.',
-    rate_limited: 'Muitas leituras seguidas. Espere um pouco e tente de novo.',
-    image_rejected: 'Não consegui abrir essa imagem. Tente outro print.',
-    invalid_json: 'Não consegui entender o print. Tente um print mais nítido ou cole o texto.',
-    session_expired: 'Sua sessão expirou. Entre no Claude de novo.',
-    refused: 'Não consegui ler esse conteúdo.'
-  })[code] || 'Falha ao ler. Tente de novo.';
 }
 function mostrarResultado(res) {
   S.imp.res = res; S.imp.fase = 'pronto';
@@ -606,33 +870,63 @@ async function lerArquivos(files) {
       if (r.texto) textos.push(r.texto.trim());
     } catch (e) { falhas++; }
   }
-  if (!prods.length && !marcas.length) { S.imp.fase = 'idle'; S.imp.erro = falhas ? (srv.online ? 'Não consegui ler o print. Tente de novo ou cole os códigos.' : 'Não consegui ler o print sem o Termux. Abra o Termux, digite rep e tente de novo, ou cole os códigos.') : 'Não encontrei códigos nem marcas no print. Confira se é o print certo ou cole os códigos.'; S.imp.textoLido = textos.join('\n\n'); render(); return; }
+  if (!prods.length && !marcas.length) { S.imp.fase = 'idle'; S.imp.erro = falhas ? (srv.online ? 'Não consegui ler o print. Tente de novo ou digite os códigos.' : 'Não consegui ler o print sem o Termux. Abra o Termux, digite rep e tente de novo, ou digite os códigos.') : 'Não encontrei códigos nem marcas no print. Confira se é o print certo ou digite os códigos.'; render(); return; }
   mostrarResultado({ ...limpar({ produtos: prods, marcas }), texto: textos.join('\n\n---\n\n') });
   if (falhas) S.imp.erro = `${falhas} ${pl(falhas, 'print não pôde', 'prints não puderam')} ser ${pl(falhas, 'lido', 'lidos')}.`;
   render();
 }
 function lerTextoLocal(txt) {
-  const produtos = [], marcas = [];
+  const produtos2 = [], marcas = [];
   txt.split(/\n+/).forEach(bruta => {
     const l = bruta.replace(/[|\[\]{}_]+/g, ' ').replace(/\s{2,}/g, ' ').trim(); if (!l) return;
     let m = l.match(/^\D{0,3}?(\d{4,6})\s*(.*)$/);
-    if (m) { if (!produtos.some(p => p.codigo === m[1])) produtos.push({ codigo: m[1], descricao: m[2].trim(), complemento: '' }); return; }
+    if (m) { if (!produtos2.some(p => p.codigo === m[1])) produtos2.push({ codigo: m[1], descricao: m[2].trim(), complemento: '' }); return; }
     m = l.match(/^\D{0,3}?(\d{2,3})\s+([A-Za-zÀ-ÿ].{1,})$/);
     if (m && !marcas.some(x => norm(x) === norm(m[2]))) marcas.push(m[2].trim());
   });
-  return { produtos, marcas };
+  return { produtos: produtos2, marcas };
+}
+function aprenderCatalogo(res) {
+  const marca1 = res.marcas.length === 1 ? res.marcas[0] : '';
+  const novos = [];
+  for (const p of res.produtos) {
+    const k = normCode(p.codigo); if (!k) continue;
+    const desc = [p.descricao, p.complemento].filter(Boolean).join(' ').replace(/\s{2,}/g, ' ').trim(); if (!desc) continue;
+    const ex = items.get('p_' + k);
+    if (ex && ex.descricao === desc && (ex.marca || !marca1)) continue;
+    novos.push({ ...(ex || {}), id: 'p_' + k, kind: 'produto', codigo: p.codigo.replace(/^0+/, '') || p.codigo, descricao: ex && ex.manual ? ex.descricao : desc, marca: (ex && ex.marca) || marca1, aprendidoEm: (ex && ex.aprendidoEm) || now() });
+  }
+  return novos;
 }
 async function aplicarImp() {
   const im = S.imp; if (!im.res) return;
   const ids = [...im.sel]; im.fase = 'salvando'; render();
   let n = 0;
   for (const id of ids) { try { await setStatus(id, im.status, 'print'); n++; } catch (e) { } }
+  const novos = aprenderCatalogo(im.res);
   try {
-    await save(newId('imp'), { kind: 'imp', em: now(), status: im.status, nProd: im.res.produtos.length, nMarcas: im.res.marcas.length, atualizadas: n, codigos: im.res.produtos.map(p => normCode(p.codigo)).filter(Boolean).slice(0, 500), marcas: im.res.marcas.slice(0, 100) });
+    await saveMany([...novos, { id: newId('imp'), kind: 'imp', em: now(), status: im.status, nProd: im.res.produtos.length, nMarcas: im.res.marcas.length, atualizadas: n, codigos: im.res.produtos.map(p => normCode(p.codigo)).filter(Boolean).slice(0, 500), marcas: im.res.marcas.slice(0, 100) }]);
   } catch (e) { }
   S.imp = { ...im, fase: 'idle', res: null, match: null, sel: new Set(), texto: '' };
-  toast(n ? `${n} ${pl(n, 'falta atualizada', 'faltas atualizadas')}` : 'Chegada registrada');
+  vibrar();
+  toast((n ? `${n} ${pl(n, 'falta atualizada', 'faltas atualizadas')}` : 'Chegada registrada') + (novos.length ? ` · ${novos.length} no catálogo` : ''));
   render();
+}
+
+/* ---------- roteiro e visitas ---------- */
+async function salvarRoteiro(sel, data) {
+  data = data || hojeISO();
+  const r = roteiro(data) || { kind: 'roteiro', data, visitados: {} };
+  await save('rot_' + data, { ...r, clientes: sel });
+}
+async function marcarVisita(cid, obs) {
+  const c = cli(cid); if (!c) return;
+  const em = now();
+  const vis = [...(Array.isArray(c.visitas) ? c.visitas : []), { em, obs: obs || '' }].slice(-100);
+  await save(cid, { ...c, ultimaVisita: em, visitas: vis }, true);
+  const r = roteiro();
+  if (r && (r.clientes || []).includes(cid)) await save(r.id, { ...r, visitados: { ...(r.visitados || {}), [cid]: em } }, true);
+  aposMudar(); vibrar();
 }
 
 /* ---------- backup ---------- */
@@ -652,42 +946,82 @@ async function restaurar() {
 }
 
 /* ---------- eventos ---------- */
+function novaLinha() { return { codigo: '', produto: '', qtd: '', preco: '' }; }
 document.addEventListener('click', async e => {
   if (e.target.matches && e.target.matches('[data-ovl]')) { closeModal(); return; }
   const el = e.target.closest('[data-act]'); if (!el) return;
   const act = el.dataset.act, id = el.dataset.id;
   try {
     switch (act) {
-      case 'tab': S.tab = el.dataset.t; if (S.tab !== 'clientes') S.cli = null; window.scrollTo(0, 0); render(); break;
+      case 'tab': S.tab = el.dataset.t; S.cli = null; S.sub = null; window.scrollTo(0, 0); render(); break;
+      case 'sub': S.sub = el.dataset.s; window.scrollTo(0, 0); render(); break;
+      case 'subVoltar': S.sub = null; window.scrollTo(0, 0); render(); break;
+      case 'irBackup': S.tab = 'mais'; S.sub = 'backup'; window.scrollTo(0, 0); render(); break;
+      case 'irPedidos': S.tab = 'mais'; S.sub = 'pedidos'; window.scrollTo(0, 0); render(); break;
       case 'filtro': S.filtro = el.dataset.f; S.tab = 'faltas'; render(); break;
-      case 'openCli': S.cli = id; S.tab = 'clientes'; S.nota = ''; window.scrollTo(0, 0); render(); break;
+      case 'openCli': S.cli = id; S.tab = 'clientes'; S.cliTab = 'faltas'; S.nota = ''; window.scrollTo(0, 0); render(); break;
       case 'backCli': S.cli = null; render(); break;
+      case 'cliTab': S.cliTab = el.dataset.t; render(); break;
       case 'novaFalta': openModal({ type: 'falta', clienteId: id || null }); break;
       case 'editFalta': openModal({ type: 'falta', id }); break;
       case 'novoCli': openModal({ type: 'cliente' }); break;
       case 'editCli': openModal({ type: 'cliente', id }); break;
       case 'faltaMenu': openModal({ type: 'faltaMenu', id }); break;
       case 'closeModal': closeModal(); break;
-      case 'st': el.disabled = true; await setStatus(id, el.dataset.s); if (el.dataset.close) closeModal(); toast('Situação: ' + ST[el.dataset.s].label); break;
-      case 'ofertarCli': { el.disabled = true; const l = faltas().filter(f => f.clienteId === id && f.status === 'disponivel'); for (const f of l) await setStatus(f.id, 'ofertado'); toast(`${l.length} ${pl(l.length, 'marcada', 'marcadas')} como ofertado`); break; }
+      case 'pickProd': preencherFalta(items.get(id)); break;
+      case 'st': el.disabled = true; await setStatus(id, el.dataset.s); vibrar(); if (el.dataset.close) closeModal(); toast('Situação: ' + ST[el.dataset.s].label); break;
+      case 'ofertarCli': { el.disabled = true; const l = faltas().filter(f => f.clienteId === id && f.status === 'disponivel'); for (const f of l) await setStatus(f.id, 'ofertado'); vibrar(); toast(`${l.length} ${pl(l.length, 'marcada', 'marcadas')} como ofertado`); break; }
       case 'delFalta': openModal({ type: 'confirm', text: 'Excluir esta falta? Isso não pode ser desfeito.', action: 'delFalta', id }); break;
-      case 'delCli': { const n = faltas().filter(f => f.clienteId === id).length; openModal({ type: 'confirm', text: `Excluir este cliente${n ? ' e suas ' + n + ' faltas' : ''}? Isso não pode ser desfeito.`, action: 'delCli', id }); break; }
+      case 'delCli': { const n = faltas().filter(f => f.clienteId === id).length; openModal({ type: 'confirm', text: `Excluir este cliente${n ? ' e suas ' + n + ' faltas' : ''}? Os pedidos ficam guardados. Isso não pode ser desfeito.`, action: 'delCli', id }); break; }
+      case 'delPedido': openModal({ type: 'confirm', text: 'Excluir este pedido? Isso não pode ser desfeito.', action: 'delPedido', id }); break;
+      case 'delProduto': openModal({ type: 'confirm', text: 'Tirar este produto do catálogo? Ele volta se aparecer num print.', action: 'delProduto', id, ok: 'Tirar' }); break;
       case 'confirmYes': {
         const m = S.modal; closeModal();
         if (m.action === 'delFalta') { await del(m.id); toast('Falta excluída'); }
+        if (m.action === 'delPedido') { await del(m.id); toast('Pedido excluído'); }
+        if (m.action === 'delProduto') { await del(m.id); toast('Produto retirado'); }
         if (m.action === 'delCli') { for (const f of faltas().filter(f => f.clienteId === m.id)) await del(f.id); await del(m.id); S.cli = null; render(); toast('Cliente excluído'); }
         break;
       }
       case 'addNota': { const t = S.nota.trim(); if (!t) { toast('Escreva a anotação primeiro'); break; } const c = cli(S.cli); const notas = [...(Array.isArray(c.notas) ? c.notas : []), { em: now(), txt: t }].slice(-200); S.nota = ''; await patch(c.id, { notas }); toast('Anotação salva'); break; }
       case 'delNota': { const c = cli(S.cli); const notas = (c.notas || []).filter((_, i) => i !== Number(el.dataset.i)); await patch(c.id, { notas }); break; }
+      // roteiro / visitas
+      case 'montarRoteiro': { const r = roteiro(); openModal({ type: 'roteiro', sel: r ? (r.clientes || []).filter(x => cli(x)) : [] }); break; }
+      case 'rotPor': S.modal.sel.push(id); renderModal(); break;
+      case 'rotTirar': S.modal.sel.splice(Number(el.dataset.i), 1); renderModal(); break;
+      case 'rotUp': case 'rotDown': { const i = Number(el.dataset.i), j = act === 'rotUp' ? i - 1 : i + 1; const s = S.modal.sel; if (j < 0 || j >= s.length) break; [s[i], s[j]] = [s[j], s[i]]; renderModal(); break; }
+      case 'rotSalvar': { const amanha = S.modal.dia === 1; await salvarRoteiro(S.modal.sel.slice(), amanha ? dataISO(1) : hojeISO()); closeModal(); toast(amanha ? 'Roteiro de amanhã salvo' : 'Roteiro salvo'); break; }
+      case 'rotDia': { const d = Number(el.dataset.d); const r = roteiro(d ? dataISO(1) : hojeISO()); S.modal.dia = d; S.modal.sel = r ? (r.clientes || []).filter(x => cli(x)) : []; renderModal(); break; }
+      case 'temMercos': await setStatus(id, 'disponivel', 'mercos'); vibrar(); toast('Marcada como Disponível'); break;
+      case 'copiar': { const v = el.dataset.v; try { await navigator.clipboard.writeText(v); toast('Código ' + v + ' copiado. Cole na busca do Mercos.'); } catch (e2) { toast('Código: ' + v); } break; }
+      case 'rotAdd': { const r = roteiro(); const sel = r ? (r.clientes || []).slice() : []; if (!sel.includes(id)) sel.push(id); await salvarRoteiro(sel); toast('Adicionado ao roteiro de hoje'); break; }
+      case 'visitei': await marcarVisita(id); toast('Visita registrada'); break;
+      case 'registrarVisita': openModal({ type: 'visita', id }); break;
+      // pedidos
+      case 'novoPedido': openModal({ type: 'pedido', clienteId: id || (S.cli || ''), linhas: [novaLinha()] }); break;
+      case 'editPedido': { const p = items.get(id); openModal({ type: 'pedido', id, clienteId: p.clienteId, linhas: (p.itens || []).map(it => ({ codigo: it.codigo || '', produto: it.produto || '', qtd: String(it.qtd || ''), preco: fmtNum(it.preco) })) }); break; }
+      case 'pedidoMenu': openModal({ type: 'pedidoMenu', id }); break;
+      case 'pedSt': await patch(id, { status: el.dataset.s }); vibrar(); break;
+      case 'plAdd': S.modal.linhas.push(novaLinha()); renderModal(); { const n = S.modal.linhas.length - 1; const inp = document.getElementById(`pl-${n}-codigo`); if (inp) inp.focus(); } break;
+      case 'plDel': S.modal.linhas.splice(Number(el.dataset.i), 1); renderModal(); break;
+      case 'csvPedidos': baixar(`pedidos-${hojeISO()}.csv`, new Blob([csvPedidos()], { type: 'text/csv' })); break;
+      // catálogo
+      case 'novoProduto': openModal({ type: 'produto' }); break;
+      case 'editProduto': openModal({ type: 'produto', id }); break;
+      // mensagens
+      case 'msgPadrao': { const c = cfg(); await save('cfg', { ...c, kind: 'cfg', msgDisp: MSG_DISP, msgArm: MSG_ARM }); toast('Mensagens padrão restauradas'); break; }
+      // chegadas
       case 'impStatus': S.imp.status = el.dataset.s; if (S.imp.res) { S.imp.match = casar(S.imp.res, S.imp.status); S.imp.sel = new Set(S.imp.match.exatos.map(x => x.f.id)); } render(); break;
-      case 'impTexto': S.imp.mostraTexto = !S.imp.mostraTexto || !srv.ocr; render(); break;
+      case 'impTexto': S.imp.mostraTexto = !S.imp.mostraTexto; render(); break;
       case 'impLerTexto': {
         const t = S.imp.texto.trim(); if (!t) { toast('Cole ou digite os códigos primeiro'); break; }
         const res = lerTextoLocal(t);
         if (!res.produtos.length && !res.marcas.length) { toast('Não encontrei códigos no texto'); break; }
         S.imp.erro = null; mostrarResultado(res); render(); break;
       }
+      case 'impAplicar': await aplicarImp(); break;
+      case 'impLimpar': S.imp = { ...S.imp, fase: 'idle', res: null, match: null, sel: new Set(), erro: null }; render(); break;
+      // backup
       case 'reconectar': S.dbErr = null; render(); init(); break;
       case 'syncAgora': {
         el.disabled = true; el.textContent = 'Enviando…';
@@ -699,52 +1033,105 @@ document.addEventListener('click', async e => {
       case 'restOne': openModal({ type: 'restore', origem: 'onedrive' }); break;
       case 'importAntigo': openModal({ type: 'restore', origem: 'antigo' }); break;
       case 'compartilhar': await compartilharBackup(); break;
-      case 'baixarCsv': baixar(`faltas-${hojeISO()}.csv`, new Blob([csv()], { type: 'text/csv' })); break;
+      case 'baixarCsv': baixar(`faltas-${hojeISO()}.csv`, new Blob([csvFaltas()], { type: 'text/csv' })); break;
       case 'baixarJson': baixar(`backup-representante-${hojeISO()}.json`, new Blob([JSON.stringify(pacote())], { type: 'application/json' })); meta.ultimoCompartilhado = now(); await metaSet('ultimoCompartilhado', meta.ultimoCompartilhado); render(); break;
-      case 'impAplicar': await aplicarImp(); break;
-      case 'impLimpar': S.imp = { ...S.imp, fase: 'idle', res: null, match: null, sel: new Set(), erro: null }; render(); break;
       case 'restoreYes': await restaurar(); break;
     }
   } catch (err) { toast('Não consegui salvar no celular. Tente de novo.'); render(); }
 });
 document.addEventListener('input', e => {
-  const k = e.target.dataset && e.target.dataset.in; if (!k) return;
-  if (k === 'impTexto') { S.imp.texto = e.target.value; return; }
-  S[k] = e.target.value;
-  if (k === 'busca' || k === 'buscaCli') render();
+  const t = e.target;
+  // itens do pedido
+  if (t.dataset && t.dataset.pl && S.modal && S.modal.type === 'pedido') {
+    const [i, campo] = t.dataset.pl.split(':'); const l = S.modal.linhas[Number(i)]; if (!l) return;
+    l[campo] = t.value;
+    if (campo === 'codigo') {
+      const p = prodPorCodigo(t.value);
+      if (p) { l.produto = p.descricao; const pe = document.getElementById(`pl-${i}-produto`); if (pe) pe.value = p.descricao; if (!l.preco && p.preco) { l.preco = fmtNum(p.preco); const pr = document.getElementById(`pl-${i}-preco`); if (pr) pr.value = l.preco; } }
+    }
+    const tot = S.modal.linhas.reduce((s, x) => s + (Number(x.qtd) || 0) * numBR(x.preco), 0);
+    const te = $('#pedTotal'); if (te) te.textContent = reais(tot);
+    return;
+  }
+  // falta: código e sugestões do catálogo
+  if (t.form && t.form.dataset.form === 'falta') {
+    if (t.name === 'codigo') {
+      const p = prodPorCodigo(t.value); const hh = $('#codHint');
+      if (p) { t.form.produto.value = p.descricao; if (!t.form.marca.value && p.marca) t.form.marca.value = p.marca; if (hh) hh.textContent = '✓ ' + p.descricao; }
+      else if (hh) hh.textContent = t.value.length >= 4 && produtos().length ? 'Código fora do catálogo: digite o nome do produto.' : 'Digite o código: o produto vem do catálogo.';
+    }
+    if (t.name === 'produto') {
+      const sg = $('#sugProd'); if (!sg) return;
+      const r = t.value.trim().length >= 2 ? buscaProdutos(t.value) : [];
+      sg.innerHTML = r.length ? `<div class="sug">${r.map(p => `<button type="button" data-act="pickProd" data-id="${esc(p.id)}"><b>${esc(p.codigo)}</b> · ${esc(p.descricao)}${p.marca ? ' <span class="hint">· ' + esc(p.marca) + '</span>' : ''}</button>`).join('')}</div>` : '';
+    }
+    return;
+  }
+  const k = t.dataset && t.dataset.in; if (!k) return;
+  if (k === 'impTexto') { S.imp.texto = t.value; return; }
+  S[k] = t.value;
+  if (k === 'busca' || k === 'buscaCli' || k === 'buscaCat') render();
 });
 document.addEventListener('change', e => {
   const t = e.target;
   if (t.id === 'impFile' && t.files && t.files.length) { lerArquivos([...t.files].slice(0, 10)); }
   else if (t.id === 'restFile' && t.files && t.files[0]) lerRestore(t.files[0]);
-  else if (t.dataset && t.dataset.chk) { t.checked ? S.imp.sel.add(t.dataset.chk) : S.imp.sel.delete(t.dataset.chk); const b = document.querySelector('[data-act="impAplicar"]'); if (b) { const n = S.imp.sel.size; b.textContent = n ? `Atualizar ${n} ${pl(n, 'falta', 'faltas')}` : 'Registrar chegada sem atualizar'; } }
+  else if (t.dataset && t.dataset.chk) { t.checked ? S.imp.sel.add(t.dataset.chk) : S.imp.sel.delete(t.dataset.chk); const b = document.querySelector('[data-act="impAplicar"]'); if (b) { const n = S.imp.sel.size; b.textContent = n ? `Atualizar ${n} ${pl(n, 'falta', 'faltas')}` : 'Registrar chegada'; } }
 });
 document.addEventListener('submit', async e => {
   const form = e.target.closest('form[data-form]'); if (!form) return;
   e.preventDefault();
-  const fd = Object.fromEntries(new FormData(form)); const btn = form.querySelector('[type=submit]');
+  const fd = new FormData(form); const o = Object.fromEntries(fd); const btn = form.querySelector('[type=submit]');
+  const tipo = form.dataset.form;
   try {
-    if (form.dataset.form === 'cliente') {
-      if (!fd.nome.trim()) { toast('Informe o nome da loja'); return; }
+    if (tipo === 'cliente') {
+      if (!o.nome.trim()) { toast('Informe o nome da loja'); return; }
       btn.disabled = true;
       const id = S.modal.id || newId('c'); const old = items.get(id) || {};
-      await save(id, { ...old, kind: 'cliente', nome: fd.nome.trim(), cidade: fd.cidade.trim(), comprador: fd.comprador.trim(), telefone: fd.telefone.trim(), notas: old.notas || [], criadoEm: old.criadoEm || now() });
+      await save(id, { ...old, kind: 'cliente', nome: o.nome.trim(), endereco: (o.endereco || '').trim(), cidade: o.cidade.trim(), comprador: o.comprador.trim(), telefone: o.telefone.trim(), diasVisita: fd.getAll('dia').map(Number), freq: o.freq ? Number(o.freq) : null, notas: old.notas || [], visitas: old.visitas || [], criadoEm: old.criadoEm || now() });
       closeModal(); toast('Cliente salvo');
-      if (!S.modal && !old.kind) { S.cli = id; S.tab = 'clientes'; render(); }
-    } else if (form.dataset.form === 'falta') {
-      let cid = fd.clienteId;
-      if (fd.novoCliente.trim()) { btn.disabled = true; cid = newId('c'); await save(cid, { kind: 'cliente', nome: fd.novoCliente.trim(), notas: [], criadoEm: now() }); }
+      if (!old.kind) { S.cli = id; S.tab = 'clientes'; S.cliTab = 'faltas'; render(); }
+    } else if (tipo === 'falta') {
+      let cid = o.clienteId;
+      if (o.novoCliente && o.novoCliente.trim()) { btn.disabled = true; cid = newId('c'); await save(cid, { kind: 'cliente', nome: o.novoCliente.trim(), notas: [], visitas: [], criadoEm: now() }); }
       if (!cid) { toast('Escolha o cliente'); btn.disabled = false; return; }
-      if (!fd.produto.trim() && !fd.codigo.trim()) { toast('Informe o produto ou o código'); btn.disabled = false; return; }
+      if (!o.produto.trim() && !o.codigo.trim()) { toast('Informe o produto ou o código'); btn.disabled = false; return; }
       btn.disabled = true;
-      const id = S.modal.id || newId('f'); const old = items.get(id) || {}; const st = fd.status || 'aguardando';
+      const id = S.modal.id || newId('f'); const old = items.get(id) || {}; const st = o.status || 'aguardando';
       const hist = Array.isArray(old.hist) ? old.hist.slice() : [];
       if (!old.kind) hist.push({ s: st, em: now(), via: 'cadastro' }); else if (old.status !== st) hist.push({ s: st, em: now(), via: 'manual' });
-      await save(id, { ...old, kind: 'falta', clienteId: cid, codigo: fd.codigo.trim(), produto: fd.produto.trim(), marca: fd.marca.trim(), qtd: fd.qtd ? Number(fd.qtd) : null, obs: fd.obs.trim(), status: st, criadoEm: old.criadoEm || now(), atualizadoEm: now(), hist });
-      closeModal();
-      const c = normCode(fd.codigo); let aviso = '';
+      const novos = [{ ...old, id, kind: 'falta', clienteId: cid, codigo: o.codigo.trim(), produto: o.produto.trim(), marca: o.marca.trim(), qtd: o.qtd ? Number(o.qtd) : null, obs: o.obs.trim(), status: st, criadoEm: old.criadoEm || now(), atualizadoEm: now(), hist }];
+      const c = normCode(o.codigo);
+      if (c && o.produto.trim() && !prodPorCodigo(c)) novos.push({ id: 'p_' + c, kind: 'produto', codigo: c, descricao: o.produto.trim(), marca: o.marca.trim(), manual: true, aprendidoEm: now() });
+      await saveMany(novos);
+      closeModal(); vibrar();
+      let aviso = '';
       if (c && !old.kind) { const recente = imps().find(x => (Date.now() - new Date(x.em)) < 15 * 864e5 && (x.codigos || []).includes(c)); if (recente) aviso = ` Atenção: este código apareceu como ${ST[recente.status].label} no print de ${dm(recente.em)}.`; }
       toast('Falta salva.' + aviso);
+    } else if (tipo === 'visita') {
+      btn.disabled = true; await marcarVisita(S.modal.id, (o.obs || '').trim()); closeModal(); toast('Visita registrada');
+    } else if (tipo === 'pedido') {
+      if (!o.clienteId) { toast('Escolha o cliente'); return; }
+      const its = S.modal.linhas.map(l => ({ codigo: l.codigo.trim(), produto: l.produto.trim(), qtd: Number(l.qtd) || 0, preco: numBR(l.preco) })).filter(l => (l.produto || l.codigo) && l.qtd > 0);
+      if (!its.length) { toast('Inclua pelo menos um item com quantidade'); return; }
+      btn.disabled = true;
+      const id = S.modal.id || newId('ped'); const old = items.get(id) || {};
+      const total = +its.reduce((s, l) => s + l.qtd * l.preco, 0).toFixed(2);
+      const lista = [{ ...old, id, kind: 'pedido', clienteId: o.clienteId, em: old.em || now(), itens: its, total, status: o.status || 'anotado', obs: (o.obs || '').trim(), atualizadoEm: now() }];
+      // catálogo aprende produto e último preço
+      its.forEach(l => { const k = normCode(l.codigo); if (!k) return; const ex = items.get('p_' + k); if (!ex && l.produto) lista.push({ id: 'p_' + k, kind: 'produto', codigo: k, descricao: l.produto, marca: '', manual: true, preco: l.preco || null, aprendidoEm: now() }); else if (ex && l.preco && ex.preco !== l.preco) lista.push({ ...ex, preco: l.preco }); });
+      await saveMany(lista);
+      closeModal(); vibrar(); toast('Pedido salvo · ' + reais(total));
+    } else if (tipo === 'produto') {
+      const k = normCode(o.codigo); if (!k || !o.descricao.trim()) { toast('Informe código e descrição'); return; }
+      btn.disabled = true;
+      const id = S.modal.id || 'p_' + k; const old = items.get(id) || {};
+      await save(id, { ...old, kind: 'produto', codigo: old.codigo || k, descricao: o.descricao.trim(), marca: o.marca.trim(), preco: o.preco ? numBR(o.preco) : null, manual: true, aprendidoEm: old.aprendidoEm || now() });
+      closeModal(); toast('Produto salvo');
+    } else if (tipo === 'mensagens') {
+      const c = cfg(); await save('cfg', { ...c, kind: 'cfg', msgDisp: o.msgDisp, msgArm: o.msgArm }); toast('Mensagens salvas');
+    } else if (tipo === 'config') {
+      const c = cfg(); await save('cfg', { ...c, kind: 'cfg', freq: Number(o.freq) || 14 }); toast('Frequência salva');
     }
   } catch (err) { if (btn) btn.disabled = false; toast('Não consegui salvar no celular. Tente de novo.'); }
 });
@@ -774,11 +1161,11 @@ async function init() {
   receberCompartilhados();
 }
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
-setInterval(async () => { if (!S.loaded) return; await status(); if (srv.online && meta.pendente) await enviarTermux(); if (S.tab === 'mais' || S.tab === 'inicio') render(); }, 30000);
+setInterval(async () => { if (!S.loaded) return; await status(); if (srv.online && meta.pendente) await enviarTermux(); if (S.tab === 'inicio' || (S.tab === 'mais' && S.sub === 'backup')) { if (!S.modal) render(); } }, 30000);
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState !== 'visible' || !S.loaded) return;
   await status(); if (srv.online && meta.pendente) await enviarTermux();
-  render();
+  if (!S.modal) render();
 });
 init();
 </script>
