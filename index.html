@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Representante – Faltas e Clientes</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1B2A41">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F5F7;--sf:#fff;--ink:#12161C;--mu:#5B6470;--ln:#E3E6EB;--nv:#1B2A41;--ac:#C2410C}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+#app{max-width:560px;margin:0 auto;min-height:100vh;padding:calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 160px)}
+h1{font-family:'Space Grotesk',Inter,sans-serif;font-size:26px;letter-spacing:-.02em;margin:0;line-height:1.15}
+h2{font-size:17px;margin:0}
+.sub{color:var(--mu);font-size:14px;margin:4px 0 0;line-height:1.45}
+.stack{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:16px}
+.hero{background:var(--nv);color:#fff;border-radius:18px;padding:18px}
+.hero .eyebrow{color:#FDBA74}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:4px 8px;border-radius:6px;white-space:nowrap;flex:none}
+.btn{min-height:44px;padding:0 16px;border-radius:12px;border:1px solid #CBD2DA;background:#fff;color:var(--nv);font-weight:600;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-decoration:none;line-height:1.2}
+.btn.pri{background:var(--nv);border-color:var(--nv);color:#fff}
+.btn.acc{background:var(--ac);border-color:var(--ac);color:#fff}
+.btn.wa{background:#15803D;border-color:#15803D;color:#fff}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.danger{color:#B91C1C;border-color:#FCA5A5}
+.btn.dangerfill{background:#B91C1C;border-color:#B91C1C;color:#fff}
+.btn.block{width:100%}
+.btn.sm{min-height:40px;font-size:14px;padding:0 12px}
+.btn:disabled{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat{background:#fff;border:1px solid var(--ln);border-radius:14px;padding:12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:'Space Grotesk',Inter,sans-serif;font-size:24px}
+.stat span{font-size:12px;color:var(--mu)}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.t{font-weight:600;font-size:15px;line-height:1.3}
+.m{font-size:13px;color:var(--mu);margin-top:3px;line-height:1.4}
+.list{display:flex;flex-direction:column;gap:10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.fchip{flex:none;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid #D5DAE1;background:#fff;color:var(--nv);font-weight:600;font-size:14px;cursor:pointer}
+.fchip[aria-pressed="true"]{background:var(--nv);color:#fff;border-color:var(--nv)}
+.search{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 14px;background:#fff;border:1px solid #D5DAE1;border-radius:12px;color:var(--mu)}
+.search input{flex:1;border:0;outline:0;background:transparent;font-size:16px;color:var(--ink);min-width:0}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
+.inp{min-height:48px;padding:10px 14px;border:1px solid #CBD2DA;border-radius:12px;background:#fff;font-size:16px;font-weight:400;width:100%}
+textarea.inp{min-height:84px;resize:vertical}
+.hint{font-size:13px;color:var(--mu);font-weight:400}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);display:flex;justify-content:center;padding:6px 4px calc(env(safe-area-inset-bottom) + 8px);z-index:10}
+nav.tabs button{flex:1;max-width:110px;min-height:52px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:600;color:var(--mu);cursor:pointer;position:relative}
+nav.tabs button[aria-current="page"]{color:var(--ac);font-weight:700}
+.badge{position:absolute;top:3px;left:calc(50% + 5px);background:var(--ac);color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:flex;align-items:center;justify-content:center}
+.fab{position:fixed;right:max(16px, calc(50% - 264px));bottom:calc(env(safe-area-inset-bottom) + 84px);z-index:9;height:52px;padding:0 20px;border-radius:26px;background:var(--ac);color:#fff;border:0;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 20px rgba(194,65,12,.35);cursor:pointer}
+.ovl{position:fixed;inset:0;background:rgba(18,22,28,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:20px 20px 0 0;padding:20px 16px calc(env(safe-area-inset-bottom) + 20px)}
+.sheet h2{font-family:'Space Grotesk',Inter,sans-serif;font-size:20px}
+.sheethead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 150px);background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;z-index:30;max-width:90vw;display:none;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.empty{text-align:center;color:var(--mu);padding:24px 12px;font-size:14px;line-height:1.5}
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid #EEF0F3;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--ac);margin-top:1px;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.back{display:inline-flex;align-items:center;gap:4px;min-height:44px;border:0;background:none;color:var(--nv);font-weight:600;cursor:pointer;padding:0 8px 0 0}
+.note{background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:12px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.note small{color:#92400E;font-weight:600}
+details summary{cursor:pointer;font-weight:600;color:var(--nv);min-height:44px;display:flex;align-items:center}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:4px;background:#E6E9EE;border-radius:12px}
+.seg button{min-height:44px;border:0;border-radius:9px;background:transparent;font-weight:600;color:#4B5563;cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.spin{width:20px;height:20px;border:2.5px solid #CBD2DA;border-top-color:var(--ac);border-radius:50%;animation:sp .8s linear infinite;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.cliline{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid #EEF0F3;font-size:14px}
+a{color:var(--ac)}
+.linkbtn{border:0;background:none;padding:0;color:inherit;text-align:left;cursor:pointer;width:100%}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const VERSAO = '1.3';
+// ponte opcional no Termux (OneDrive automático e leitura de prints mais precisa)
+const PONTE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') && location.port === '8765' ? '' : 'http://127.0.0.1:8765';
+const ST = {
+  aguardando: { label: 'Aguardando', fg: '#374151', bg: '#E5E7EB', rank: 0 },
+  armazenando: { label: 'Armazenando', fg: '#92400E', bg: '#FEF3C7', rank: 1 },
+  disponivel: { label: 'Disponível', fg: '#166534', bg: '#DCFCE7', rank: 2 },
+  ofertado: { label: 'Ofertado', fg: '#1E40AF', bg: '#DBEAFE', rank: 3 },
+  vendido: { label: 'Vendido', fg: '#FFFFFF', bg: '#1B2A41', rank: 4 },
+  cancelado: { label: 'Cancelado', fg: '#4B5563', bg: '#F3F4F6', rank: 5 }
+};
+const ORDEM = ['disponivel', 'armazenando', 'aguardando', 'ofertado', 'vendido', 'cancelado'];
+const I = {
+  home: '<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  box: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+  store: '<path d="M3 9l1.5-5h15L21 9"/><path d="M3 9v11h18V9"/><path d="M3 9h18"/><path d="M9 20v-6h6v6"/>',
+  truck: '<path d="M3 6h11v10H3z"/><path d="M14 9h4l3 3v4h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
+  cloud: '<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4 4 0 0 1 0 9z"/>',
+  plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
+  back: '<path d="M15 6l-6 6 6 6"/>',
+  wa: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-5.1A8 8 0 1 1 21 12z"/>',
+  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+  more: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+  x: '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+  chev: '<path d="M9 6l6 6-6 6"/>'
+};
+const svg = (p, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+
+let srv = { online: false, onedrive: false, ultimoSync: null, erroSync: null, ocr: false, melhoraImagem: false, pastaCelular: false, versao: VERSAO };
+const items = new Map();
+const S = {
+  tab: 'inicio', cli: null, filtro: 'disponivel', busca: '', buscaCli: '', nota: '',
+  loaded: false, slow: false, noDb: false, dbErr: null, modal: null, ctl: null,
+  imp: { status: 'disponivel', fase: 'idle', res: null, match: null, sel: new Set(), erro: null, texto: '', mostraTexto: false }
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
+const normCode = s => String(s || '').replace(/\D/g, '').replace(/^0+/, '');
+const now = () => new Date().toISOString();
+const dm = iso => { if (!iso) return ''; const d = new Date(iso); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); };
+const hm = iso => { const d = new Date(iso); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+const hojeISO = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const newId = p => p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pl = (n, a, b) => n === 1 ? a : b;
+const sameMonth = iso => { if (!iso) return false; const a = new Date(iso), b = new Date(); return a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear(); };
+const groupBy = (arr, k) => { const m = new Map(); arr.forEach(x => { const v = x[k] || '_'; if (!m.has(v)) m.set(v, []); m.get(v).push(x); }); return m; };
+const chip = st => { const s = ST[st] || ST.aguardando; return `<span class="chip" style="color:${s.fg};background:${s.bg}">${s.label}</span>`; };
+
+const all = () => [...items.values()];
+const clientes = () => all().filter(x => x.kind === 'cliente').sort((a, b) => norm(a.nome).localeCompare(norm(b.nome)));
+const faltas = () => all().filter(x => x.kind === 'falta');
+const cli = id => items.get(id);
+const cfg = () => items.get('cfg') || {};
+const imps = () => all().filter(x => x.kind === 'imp').sort((a, b) => (b.em || '').localeCompare(a.em || ''));
+
+/* ---------- dados no celular (IndexedDB) ---------- */
+let idb = null;
+const meta = { pendente: false, ultimoEnvio: null, ultimoOneDrive: null, ultimoCompartilhado: null };
+function abrirIDB() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('representante', 1);
+    r.onupgradeneeded = () => { const d = r.result; if (!d.objectStoreNames.contains('itens')) d.createObjectStore('itens', { keyPath: 'id' }); if (!d.objectStoreNames.contains('meta')) d.createObjectStore('meta'); };
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+function idbReq(store, mode, fn) {
+  return new Promise((res, rej) => {
+    const t = idb.transaction(store, mode); let out;
+    const r = fn(t.objectStore(store)); if (r) r.onsuccess = () => { out = r.result; };
+    t.oncomplete = () => res(out); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+  });
+}
+const metaGet = k => idbReq('meta', 'readonly', s => s.get(k));
+const metaSet = (k, v) => idbReq('meta', 'readwrite', s => s.put(v, k));
+function aposMudar() { render(); if (S.modal && S.modal.type === 'faltaMenu') renderModal(); agendarEnvio(); }
+async function save(id, data) { const obj = { ...data, id }; await idbReq('itens', 'readwrite', s => s.put(obj)); items.set(id, obj); aposMudar(); }
+async function patch(id, data) { const atual = items.get(id); if (!atual) throw new Error('não existe'); await save(id, { ...atual, ...data }); }
+async function del(id) { await idbReq('itens', 'readwrite', s => s.delete(id)); items.delete(id); aposMudar(); }
+async function recarregar() { const l = await idbReq('itens', 'readonly', s => s.getAll()); items.clear(); (l || []).forEach(x => items.set(x.id, x)); }
+async function importarItens(lista) {
+  let n = 0;
+  for (const x of lista || []) {
+    if (!x || typeof x.id !== 'string' || !x.kind || !/^[A-Za-z0-9_\-.~:@+]{1,150}$/.test(x.id)) continue;
+    await idbReq('itens', 'readwrite', s => s.put(x)); items.set(x.id, x); n++;
+  }
+  aposMudar(); return n;
+}
+const pacote = () => ({ app: 'representante-faltas', versao: VERSAO, exportadoEm: now(), itens: all() });
+
+/* ---------- ponte com o Termux (opcional) ---------- */
+async function api(method, path, body, raw, ms) {
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms || 120000);
+  const opt = { method, headers: {}, signal: ctl.signal, mode: 'cors' };
+  if (PONTE) opt.targetAddressSpace = 'loopback';
+  if (body !== undefined) { if (raw) { opt.body = body; if (body.type) opt.headers['Content-Type'] = body.type; } else { opt.body = JSON.stringify(body); opt.headers['Content-Type'] = 'application/json'; } }
+  try {
+    const r = await fetch(PONTE + path, opt); let j = {};
+    try { j = await r.json(); } catch (e) { }
+    if (!r.ok) throw new Error(j.erro || ('erro ' + r.status));
+    return j;
+  } finally { clearTimeout(t); }
+}
+async function status() {
+  try { const j = await api('GET', '/api/status', undefined, false, 2000); srv = { ...j, online: true }; if (j.ultimoSync) { meta.ultimoOneDrive = j.ultimoSync; metaSet('ultimoOneDrive', j.ultimoSync).catch(() => { }); } }
+  catch (e) { srv = { ...srv, online: false }; }
+}
+let envioT = null;
+function agendarEnvio() { meta.pendente = true; metaSet('pendente', true).catch(() => { }); clearTimeout(envioT); envioT = setTimeout(enviarTermux, 5000); }
+async function enviarTermux() {
+  try {
+    const j = await api('POST', '/api/backup', pacote(), false, 15000);
+    srv = { ...j, online: true }; meta.pendente = false; meta.ultimoEnvio = now();
+    metaSet('pendente', false).catch(() => { }); metaSet('ultimoEnvio', meta.ultimoEnvio).catch(() => { });
+    return true;
+  } catch (e) { srv = { ...srv, online: false }; return false; }
+  finally { if (S.tab === 'mais') render(); }
+}
+async function compartilharBackup() {
+  const nome = `backup-representante-${hojeISO()}.json`;
+  const file = new File([JSON.stringify(pacote())], nome, { type: 'application/json' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: 'Backup Representante' }); meta.ultimoCompartilhado = now(); await metaSet('ultimoCompartilhado', meta.ultimoCompartilhado); toast('Backup enviado'); render(); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  baixar(nome, file); meta.ultimoCompartilhado = now(); await metaSet('ultimoCompartilhado', meta.ultimoCompartilhado); toast('Arquivo salvo em Downloads. Envie ao OneDrive pelo app do OneDrive.'); render();
+}
+function baixar(nome, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nome; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000); }
+function csv() {
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const linhas = [['Cliente', 'Cidade', 'Código', 'Produto', 'Marca', 'Qtd', 'Situação', 'Anotado em', 'Atualizado em', 'Obs.'].map(q).join(';')];
+  faltas().sort((a, b) => (a.criadoEm || '').localeCompare(b.criadoEm || '')).forEach(f => { const c = cli(f.clienteId) || {}; linhas.push([c.nome, c.cidade, f.codigo, f.produto, f.marca, f.qtd, (ST[f.status] || {}).label, f.criadoEm ? new Date(f.criadoEm).toLocaleDateString('pt-BR') : '', f.atualizadoEm ? new Date(f.atualizadoEm).toLocaleDateString('pt-BR') : '', f.obs].map(q).join(';')); });
+  return '﻿' + linhas.join('\r\n');
+}
+const ultimaCopia = () => [meta.ultimoOneDrive, meta.ultimoCompartilhado].filter(Boolean).sort().pop() || null;
+async function setStatus(id, st, via) {
+  const f = items.get(id); if (!f || f.status === st) return;
+  const h = Array.isArray(f.hist) ? f.hist.slice(-30) : [];
+  h.push({ s: st, em: now(), via: via || 'manual' });
+  await patch(id, { status: st, atualizadoEm: now(), hist: h });
+}
+
+let toastT = null;
+function toast(msg) { const el = $('#toast'); el.textContent = msg; el.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => { el.style.display = 'none'; }, 3200); }
+
+function waLink(c, list, tipo) {
+  const nome = c && c.comprador ? ' ' + c.comprador.trim().split(' ')[0] : '';
+  const linhas = (list || []).map(f => `• ${f.produto || 'Produto'}${f.codigo ? ' (cód. ' + f.codigo + ')' : ''}${f.qtd ? ' – ' + f.qtd + ' un' : ''}`).join('\n');
+  let txt = '';
+  if (tipo === 'arm') txt = `Olá${nome}! Os produtos que você pediu já chegaram na Ramada e estão em liberação para venda:\n${linhas}\n\nAssim que liberar te aviso. Quer que eu já deixe no seu próximo pedido?`;
+  else if (tipo === 'disp') txt = `Olá${nome}! Boa notícia: os produtos que você pediu já estão disponíveis na Ramada:\n${linhas}\n\nPosso incluir no seu pedido?`;
+  const tel = String(c && c.telefone || '').replace(/\D/g, '');
+  const num = tel ? (tel.length <= 11 ? '55' + tel : tel) : '';
+  return `https://wa.me/${num}${txt ? '?text=' + encodeURIComponent(txt) : ''}`;
+}
+
+/* ---------- views ---------- */
+function render() {
+  const a = document.activeElement; const fid = a && a.id && a.closest && a.closest('#app') ? a.id : null; let pos = null;
+  try { pos = a.selectionStart; } catch (e) { }
+  let body;
+  if (S.dbErr) body = `<div class="card stack"><h2>Não consegui abrir seus dados</h2><p class="sub">O armazenamento do navegador está bloqueado ou cheio. Feche o app e abra de novo. Se continuar, me avise antes de limpar qualquer dado do Chrome.</p><button class="btn pri" data-act="reconectar">Tentar de novo</button></div>`;
+  else if (!S.loaded) body = `<div class="card row" style="gap:12px"><div class="spin"></div><span>Carregando seus dados…</span></div>`;
+  else body = ({ inicio: vInicio, faltas: vFaltas, chegadas: vChegadas, clientes: vClientes, mais: vMais }[S.tab])();
+  $('#app').innerHTML = body + vNav() + vFab();
+  if (fid) { const el = document.getElementById(fid); if (el) { el.focus(); if (pos != null) try { el.setSelectionRange(pos, pos); } catch (e) { } } }
+}
+
+function vNav() {
+  const disp = S.loaded ? faltas().filter(f => f.status === 'disponivel').length : 0;
+  const t = [['inicio', 'Início', I.home, disp], ['faltas', 'Faltas', I.box, 0], ['chegadas', 'Chegadas', I.truck, 0], ['clientes', 'Clientes', I.store, 0], ['mais', 'Backup', I.cloud, 0]];
+  return `<nav class="tabs" aria-label="Navegação principal">${t.map(([k, l, ic, b]) => `<button data-act="tab" data-t="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${svg(ic, 24)}${l}${b ? `<span class="badge">${b}</span>` : ''}</button>`).join('')}</nav>`;
+}
+function vFab() {
+  if (!S.loaded || !['inicio', 'faltas', 'clientes'].includes(S.tab)) return '';
+  return `<button class="fab" data-act="novaFalta" ${S.tab === 'clientes' && S.cli ? `data-id="${esc(S.cli)}"` : ''}>${svg(I.plus, 20)}Registrar falta</button>`;
+}
+
+function faltaCard(f, showCli = true) {
+  const c = cli(f.clienteId);
+  const meta = [f.codigo ? 'Cód. ' + f.codigo : null, f.marca || null, f.qtd ? f.qtd + ' un' : null, 'anotado ' + dm(f.criadoEm)].filter(Boolean).join(' · ');
+  let acts = '';
+  if (f.status === 'disponivel') acts = `<button class="btn sm" data-act="st" data-id="${f.id}" data-s="ofertado">Ofereci</button><button class="btn sm pri" data-act="st" data-id="${f.id}" data-s="vendido">Vendi</button>`;
+  else if (f.status === 'ofertado') acts = `<button class="btn sm" data-act="st" data-id="${f.id}" data-s="cancelado">Não quis</button><button class="btn sm pri" data-act="st" data-id="${f.id}" data-s="vendido">Vendi</button>`;
+  return `<article class="card" style="padding:14px">
+    <div class="item"><div style="min-width:0">
+      <div class="t">${esc(f.produto || '(sem descrição)')}</div>
+      ${showCli && c ? `<div class="m" style="color:var(--ink);font-weight:500">${esc(c.nome)}</div>` : ''}
+      <div class="m">${esc(meta)}</div>
+      ${f.obs ? `<div class="m">Obs.: ${esc(f.obs)}</div>` : ''}
+    </div>${chip(f.status)}</div>
+    <div class="row" style="margin-top:10px">${acts}<button class="btn sm ghost" data-act="faltaMenu" data-id="${f.id}">${svg(I.more, 20)} Opções</button></div>
+  </article>`;
+}
+
+function saud() { const h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; }
+
+function vInicio() {
+  const fs = faltas();
+  const disp = fs.filter(f => f.status === 'disponivel'), arm = fs.filter(f => f.status === 'armazenando'), ag = fs.filter(f => f.status === 'aguardando');
+  const of = fs.filter(f => f.status === 'ofertado'), vend = fs.filter(f => f.status === 'vendido' && sameMonth(f.atualizadoEm));
+  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  let h = `<header style="margin-bottom:18px"><p class="sub" style="margin:0 0 4px">${esc(hoje.charAt(0).toUpperCase() + hoje.slice(1))}</p><h1>${saud()}!</h1></header><div class="stack">`;
+  if (!clientes().length) {
+    h += `<section class="card stack"><span class="eyebrow">Comece por aqui</span>
+      <p class="sub" style="margin:0">1. Cadastre seus clientes.<br>2. Quando faltar um produto, registre a falta com o <b>código Ramada</b>.<br>3. Quando chegar o print no grupo da Ramada, envie na aba <b>Chegadas</b>: o app encontra quem estava esperando.</p>
+      <button class="btn pri" data-act="novoCli">${svg(I.plus, 20)}Cadastrar primeiro cliente</button></section>`;
+  }
+  const uc = ultimaCopia();
+  if (fs.length && (!uc || (Date.now() - new Date(uc)) > 3 * 864e5)) {
+    h += `<button class="card linkbtn row" data-act="tab" data-t="mais" style="justify-content:space-between;border-color:#FDE68A;background:#FFFBEB"><span><span class="t" style="display:block">Faça a cópia no OneDrive</span><span class="m" style="display:block">Última cópia: ${uc ? dm(uc) : 'nunca'}. Seus dados estão só neste celular.</span></span>${svg(I.chev, 20)}</button>`;
+  }
+  if (disp.length) {
+    const g = groupBy(disp, 'clienteId');
+    h += `<section class="hero stack" style="gap:8px"><span class="eyebrow">Disponível para venda</span><h2 style="font-size:19px;color:#fff;line-height:1.3">${disp.length} ${pl(disp.length, 'falta liberada', 'faltas liberadas')} para oferecer</h2><p style="margin:0;color:#CBD5E1;font-size:14px">${g.size} ${pl(g.size, 'cliente esperando', 'clientes esperando')}. Ofereça hoje.</p></section>`;
+    for (const [cid, list] of g) {
+      const c = cli(cid) || { nome: 'Cliente removido' };
+      h += `<article class="card stack" style="gap:8px"><button class="linkbtn item" data-act="openCli" data-id="${esc(cid)}"><span class="t">${esc(c.nome)}</span>${svg(I.chev, 20)}</button>
+        <div>${list.map(f => `<div class="cliline"><span>${esc(f.produto || '')}${f.codigo ? ' <span class="hint">· ' + esc(f.codigo) + '</span>' : ''}</span><span class="hint">${f.qtd ? f.qtd + ' un' : ''}</span></div>`).join('')}</div>
+        <div class="grid2"><a class="btn wa sm" href="${esc(waLink(c, list, 'disp'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a><button class="btn sm" data-act="ofertarCli" data-id="${esc(cid)}">Ofereci tudo</button></div></article>`;
+    }
+  } else if (fs.length) {
+    h += `<div class="card"><div class="t">Nenhuma falta liberada agora</div><p class="sub">Quando chegar um print no grupo da Ramada, envie na aba Chegadas.</p></div>`;
+  }
+  if (arm.length) {
+    const g = groupBy(arm, 'clienteId');
+    h += `<section class="card stack" style="gap:8px"><div class="item"><span class="eyebrow" style="color:#92400E">Armazenando · em liberação</span><span class="chip" style="color:#92400E;background:#FEF3C7">${arm.length}</span></div>`;
+    for (const [cid, list] of g) {
+      const c = cli(cid) || { nome: 'Cliente removido' };
+      h += `<div class="cliline" style="align-items:center"><span><b>${esc(c.nome)}</b><br><span class="hint">${list.map(f => esc(f.produto || f.codigo)).join(', ')}</span></span><a class="btn sm" href="${esc(waLink(c, list, 'arm'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a></div>`;
+    }
+    h += `</section>`;
+  }
+  if (fs.length) {
+    h += `<section class="grid3">
+      <button class="stat" data-act="filtro" data-f="aguardando"><b>${ag.length}</b><span>Aguardando</span></button>
+      <button class="stat" data-act="filtro" data-f="ofertado"><b>${of.length}</b><span>Ofertadas</span></button>
+      <button class="stat" data-act="filtro" data-f="vendido"><b>${vend.length}</b><span>Vendidas no mês</span></button></section>`;
+  }
+  return h + '</div>';
+}
+
+function vFaltas() {
+  const fs = faltas(); const cnt = k => fs.filter(f => f.status === k).length;
+  const filtros = [['disponivel', 'Disponível'], ['armazenando', 'Armazenando'], ['aguardando', 'Aguardando'], ['ofertado', 'Ofertadas'], ['vendido', 'Vendidas'], ['cancelado', 'Canceladas'], ['todas', 'Todas']];
+  let list = S.filtro === 'todas' ? fs : fs.filter(f => f.status === S.filtro);
+  const q = norm(S.busca);
+  if (q) list = list.filter(f => norm([f.produto, f.codigo, f.marca, (cli(f.clienteId) || {}).nome].join(' ')).includes(q));
+  list.sort((a, b) => (ORDEM.indexOf(a.status) - ORDEM.indexOf(b.status)) || (b.atualizadoEm || '').localeCompare(a.atualizadoEm || ''));
+  return `<header style="margin-bottom:16px"><h1>Faltas</h1><p class="sub">Produtos que o cliente pediu e não tinha.</p></header>
+  <div class="stack">
+    <label class="search">${svg(I.search, 20)}<span class="sr">Buscar faltas</span><input id="buscaF" data-in="busca" type="search" placeholder="Produto, código, marca ou cliente" value="${esc(S.busca)}"></label>
+    <div class="chips" role="group" aria-label="Filtrar por situação">${filtros.map(([k, l]) => `<button class="fchip" data-act="filtro" data-f="${k}" aria-pressed="${S.filtro === k}">${l}${k !== 'todas' ? ' · ' + cnt(k) : ''}</button>`).join('')}</div>
+    <div class="list">${list.length ? list.map(f => faltaCard(f)).join('') : `<div class="empty">${fs.length ? 'Nada nesta situação.' : 'Nenhuma falta registrada ainda.<br>Toque em “Registrar falta” quando um cliente pedir algo que não tem.'}</div>`}</div>
+  </div>`;
+}
+
+function vClientes() {
+  if (S.cli && cli(S.cli)) return vCliente();
+  const fs = faltas();
+  let list = clientes(); const q = norm(S.buscaCli);
+  if (q) list = list.filter(c => norm([c.nome, c.cidade, c.comprador].join(' ')).includes(q));
+  return `<header class="item" style="margin-bottom:16px;align-items:center"><h1>Clientes</h1><button class="btn sm" data-act="novoCli">${svg(I.plus, 18)}Novo</button></header>
+  <div class="stack">
+    <label class="search">${svg(I.search, 20)}<span class="sr">Buscar cliente</span><input id="buscaC" data-in="buscaCli" type="search" placeholder="Nome, cidade ou comprador" value="${esc(S.buscaCli)}"></label>
+    <div class="list">${list.length ? list.map(c => {
+      const mine = fs.filter(f => f.clienteId === c.id);
+      const d = mine.filter(f => f.status === 'disponivel').length, ab = mine.filter(f => ['aguardando', 'armazenando'].includes(f.status)).length;
+      return `<button class="card linkbtn item" data-act="openCli" data-id="${esc(c.id)}" style="align-items:center"><span style="min-width:0"><span class="t" style="display:block">${esc(c.nome)}</span><span class="m" style="display:block">${esc([c.cidade, c.comprador].filter(Boolean).join(' · ') || 'Sem detalhes')}</span>
+        <span class="row" style="margin-top:6px">${d ? `<span class="chip" style="color:#166534;background:#DCFCE7">${d} ${pl(d, 'disponível', 'disponíveis')}</span>` : ''}${ab ? `<span class="chip" style="color:#374151;background:#E5E7EB">${ab} em aberto</span>` : ''}</span></span>${svg(I.chev, 20)}</button>`;
+    }).join('') : `<div class="empty">${clientes().length ? 'Nenhum cliente encontrado.' : 'Nenhum cliente cadastrado ainda.'}</div>`}</div>
+  </div>`;
+}
+
+function vCliente() {
+  const c = cli(S.cli); const mine = faltas().filter(f => f.clienteId === c.id);
+  const disp = mine.filter(f => f.status === 'disponivel');
+  const tel = String(c.telefone || '').replace(/\D/g, '');
+  let h = `<button class="back" data-act="backCli">${svg(I.back, 22)}Clientes</button>
+  <section class="card stack" style="gap:10px">
+    <div class="item"><div style="min-width:0"><h1 style="font-size:23px">${esc(c.nome)}</h1>
+      <p class="sub">${esc([c.cidade, c.comprador ? 'Comprador: ' + c.comprador : ''].filter(Boolean).join(' · '))}</p>
+      ${c.telefone ? `<p class="sub">${esc(c.telefone)}</p>` : ''}</div>
+      <button class="btn sm ghost" data-act="editCli" data-id="${esc(c.id)}">Editar</button></div>
+    <div class="grid2">${tel ? `<a class="btn sm" href="${esc(waLink(c))}" target="_blank" rel="noopener">${svg(I.wa, 18)}WhatsApp</a><a class="btn sm" href="tel:${esc(tel)}">${svg(I.phone, 18)}Ligar</a>` : `<button class="btn sm" data-act="editCli" data-id="${esc(c.id)}">Adicionar telefone</button>`}</div>
+  </section>`;
+  if (disp.length) h += `<section class="hero stack" style="margin-top:12px;gap:10px"><span class="eyebrow">Ofereça nesta visita</span><h2 style="color:#fff">${disp.length} ${pl(disp.length, 'produto liberado', 'produtos liberados')}</h2><div class="grid2"><a class="btn wa sm" href="${esc(waLink(c, disp, 'disp'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a><button class="btn sm" data-act="ofertarCli" data-id="${esc(c.id)}">Ofereci tudo</button></div></section>`;
+  h += `<div class="stack" style="margin-top:16px">`;
+  if (!mine.length) h += `<div class="empty">Nenhuma falta registrada para este cliente.</div>`;
+  for (const k of ORDEM) {
+    const l = mine.filter(f => f.status === k).sort((a, b) => (b.atualizadoEm || '').localeCompare(a.atualizadoEm || ''));
+    if (!l.length) continue;
+    h += `<span class="eyebrow" style="margin-top:4px">${ST[k].label} · ${l.length}</span>${l.map(f => faltaCard(f, false)).join('')}`;
+  }
+  const notas = Array.isArray(c.notas) ? c.notas : [];
+  h += `<span class="eyebrow" style="margin-top:8px">Anotações</span>
+    ${notas.map((n, i) => ({ n, i })).reverse().map(({ n, i }) => `<div class="note"><div><small>${dm(n.em)}</small><div style="font-size:14px;line-height:1.45;margin-top:4px;white-space:pre-wrap">${esc(n.txt)}</div></div><button class="btn sm ghost" data-act="delNota" data-i="${i}" aria-label="Apagar anotação">${svg(I.x, 18)}</button></div>`).join('')}
+    <label class="f"><span class="sr">Nova anotação</span><textarea id="notaTxt" data-in="nota" class="inp" placeholder="Ex.: comprador prefere visita na terça; pagamento 28/35 dias">${esc(S.nota)}</textarea></label>
+    <button class="btn" data-act="addNota">Salvar anotação</button>
+    <button class="btn danger" data-act="delCli" data-id="${esc(c.id)}" style="margin-top:16px">Excluir cliente</button>
+  </div>`;
+  return h;
+}
+
+function vChegadas() {
+  const im = S.imp;
+  const podeImg = true;
+  let h = `<header style="margin-bottom:16px"><h1>Chegadas</h1><p class="sub">Mande o print do grupo da Ramada. O app lê os códigos e encontra quem estava esperando.</p></header><div class="stack">
+  <section class="card stack">
+    <span class="eyebrow">1. O que diz o print?</span>
+    <div class="seg" role="group" aria-label="Situação dos produtos do print">
+      <button data-act="impStatus" data-s="armazenando" aria-pressed="${im.status === 'armazenando'}">Armazenando</button>
+      <button data-act="impStatus" data-s="disponivel" aria-pressed="${im.status === 'disponivel'}">Disponível p/ venda</button>
+    </div>
+    <span class="eyebrow" style="margin-top:6px">2. Envie o print</span>
+    ${podeImg ? `<label class="btn acc block" style="cursor:pointer">${svg(I.image, 20)}Escolher print(s) da galeria<input id="impFile" type="file" accept="image/*" multiple class="sr"></label><span class="hint">Pode mandar vários prints de uma vez. Dica: no WhatsApp, abra o print, toque em compartilhar e escolha <b>Representante</b>.</span>` : `<p class="hint">Leitura de prints desligada: no Termux, rode <b>pkg install tesseract</b>. Enquanto isso, cole ou digite os códigos abaixo.</p>`}
+    <button class="btn ghost sm" data-act="impTexto" style="align-self:flex-start">${im.mostraTexto || !podeImg ? 'Colar texto' : 'Ou colar texto da mensagem'}</button>
+    ${im.mostraTexto || !podeImg ? `<label class="f"><span class="sr">Texto da mensagem</span><textarea id="impTxt" data-in="impTexto" class="inp" placeholder="Cole aqui a lista (códigos e nomes)">${esc(im.texto)}</textarea></label><button class="btn" data-act="impLerTexto">Ler texto</button>` : ''}
+  </section>`;
+  if (im.erro) h += `<div class="card" style="border-color:#FCA5A5;background:#FEF2F2"><div class="t" style="color:#991B1B">${esc(im.erro)}</div></div>`;
+  if (im.fase === 'lendo') h += `<div class="card row" style="gap:12px"><span class="spin"></span><span>${esc(im.progresso || 'Lendo o print…')}</span></div>`;
+  if ((im.fase === 'pronto' || im.fase === 'salvando') && im.res) {
+    const { exatos, possiveis, marcas } = im.match; const r = im.res; const nSel = im.sel.size;
+    const linha = (x, extra) => { const c = cli(x.f.clienteId) || {}; return `<label class="check"><input type="checkbox" data-chk="${x.f.id}" ${im.sel.has(x.f.id) ? 'checked' : ''}><span><span class="t" style="display:block">${esc(x.f.produto || x.f.codigo)}</span><span class="m" style="display:block">${esc(c.nome || '')}${x.f.codigo ? ' · cód. ' + esc(x.f.codigo) : ''} · ${ST[x.f.status].label} → <b>${ST[im.status].label}</b></span>${extra ? `<span class="m" style="display:block">${extra}</span>` : ''}</span></label>`; };
+    h += `<section class="card stack" style="gap:6px"><span class="eyebrow">3. Resultado</span><p class="sub" style="margin:0">Li ${r.produtos.length} ${pl(r.produtos.length, 'produto', 'produtos')}${r.marcas.length ? ' e ' + r.marcas.length + ' ' + pl(r.marcas.length, 'marca', 'marcas') : ''} · marcar como <b>${ST[im.status].label}</b>.</p>`;
+    if (exatos.length) h += `<div class="t" style="margin-top:10px;color:#166534">Suas faltas neste print (pelo código) · ${exatos.length}</div>${exatos.map(x => linha(x)).join('')}`;
+    if (possiveis.length) h += `<div class="t" style="margin-top:10px">Talvez sejam (pelo nome) · confira</div>${possiveis.map(x => linha(x, 'No print: ' + esc(x.p.descricao + ' ' + (x.p.complemento || '')))).join('')}`;
+    if (marcas.length) h += `<div class="t" style="margin-top:10px">Chegou a marca, confira se é o item</div>${marcas.map(x => linha(x, 'Marca no print: ' + esc(x.m))).join('')}`;
+    if (!exatos.length && !possiveis.length && !marcas.length) h += `<p class="empty" style="padding:12px 0">Nenhuma das suas faltas em aberto aparece neste print.</p>`;
+    h += `<div class="stack" style="margin-top:10px;gap:8px"><button class="btn pri block" data-act="impAplicar" ${im.fase === 'salvando' ? 'disabled' : ''}>${im.fase === 'salvando' ? 'Salvando…' : nSel ? `Atualizar ${nSel} ${pl(nSel, 'falta', 'faltas')}` : 'Registrar chegada sem atualizar'}</button><button class="btn ghost" data-act="impLimpar">Descartar</button></div>
+    <details><summary>Ver tudo que foi lido</summary><div style="font-size:13px;line-height:1.6;color:var(--mu)">${r.produtos.map(p => `${esc(p.codigo)} – ${esc(p.descricao)} ${esc(p.complemento || '')}`).join('<br>')}${r.marcas.length ? (r.produtos.length ? '<br><br>' : '') + 'Marcas: ' + r.marcas.map(esc).join(', ') : ''}</div></details>
+    ${r.texto ? `<details><summary>Texto bruto da leitura</summary><pre style="font-size:12px;white-space:pre-wrap;color:var(--mu);margin:0">${esc(r.texto)}</pre></details>` : ''}
+    <p class="hint" style="margin:0">Confira se os códigos batem com o print. Se faltou algum, cole ou digite em “Colar texto”.</p></section>`;
+  }
+  const hs = imps().slice(0, 8);
+  if (hs.length) h += `<section class="card stack" style="gap:0"><span class="eyebrow" style="margin-bottom:6px">Últimas chegadas registradas</span>${hs.map(x => `<div class="cliline"><span>${dm(x.em)} ${hm(x.em)} · ${ST[x.status] ? ST[x.status].label : ''}</span><span class="hint">${x.nProd ? x.nProd + ' prod.' : ''}${x.nMarcas ? ' ' + x.nMarcas + ' marcas' : ''} · ${x.atualizadas || 0} atualiz.</span></div>`).join('')}</section>`;
+  return h + '</div>';
+}
+
+function vMais() {
+  const on = srv.online;
+  const auto = on && srv.onedrive;
+  const st = auto ? (srv.erroSync ? ['Com problema', '#991B1B', '#FEE2E2'] : ['Automático', '#166534', '#DCFCE7']) : on ? ['Não configurado', '#92400E', '#FEF3C7'] : ['Termux desligado', '#374151', '#E5E7EB'];
+  const uc = ultimaCopia();
+  return `<header style="margin-bottom:16px"><h1>Backup</h1><p class="sub">Seus dados ficam guardados neste celular. Com o Termux ligado, cada alteração vai sozinha para a pasta <b>RepresentanteApp</b> do OneDrive. Com ele desligado, use o botão de enviar.</p></header>
+  <div class="stack">
+    <section class="card stack">
+      <div class="item"><span class="t">Cópia no OneDrive</span><span class="chip" style="color:${st[1]};background:${st[2]}">${st[0]}</span></div>
+      <p class="hint" style="margin:0">Última cópia: ${uc ? dm(uc) + ' ' + hm(uc) : 'nunca'}${meta.pendente ? ' · há alterações ainda não copiadas' : ''}</p>
+      ${auto && srv.erroSync ? `<p class="hint" style="margin:0;color:#991B1B">${esc(srv.erroSync)}</p>` : ''}
+      ${auto ? `<button class="btn pri" data-act="syncAgora">Enviar agora</button>` : ''}
+      ${on && !srv.onedrive ? `<p class="hint" style="margin:0">Para ligar o envio automático: no Termux, digite <b>rep-onedrive</b> e siga os passos.</p>` : ''}
+      ${!on ? `<p class="hint" style="margin:0">Para envio automático, abra o Termux e digite <b>rep</b>. Se o Termux estiver ligado e mesmo assim aparecer desligado, libere <b>Rede local</b> nas permissões deste site no Chrome. Ou envie agora:</p>` : ''}
+      <button class="btn ${auto ? '' : 'pri'}" data-act="compartilhar">Enviar backup (escolha OneDrive)</button>
+    </section>
+    <section class="card stack">
+      <span class="t">Baixar arquivos</span>
+      <button class="btn" data-act="baixarCsv">Planilha de faltas (.csv)</button>
+      <button class="btn" data-act="baixarJson">Backup completo (.json)</button>
+    </section>
+    <section class="card stack">
+      <span class="t">Restaurar</span>
+      <p class="hint" style="margin:0">Use em um celular novo. Os registros do backup substituem os de mesmo nome; nada é apagado.</p>
+      ${auto ? `<button class="btn" data-act="restOne">Restaurar do OneDrive</button>` : ''}
+      <label class="btn" style="cursor:pointer">Restaurar de um arquivo .json<input id="restFile" type="file" accept=".json,application/json" class="sr"></label>
+      ${on && srv.temAntigo && !items.size ? `<button class="btn" data-act="importAntigo">Trazer dados da versão 1.1</button>` : ''}
+    </section>
+    <section class="card stack" style="gap:6px">
+      <span class="t">Versão ${VERSAO}</span>
+      <p class="hint" style="margin:0">${clientes().length} clientes · ${faltas().length} faltas · ${imps().length} chegadas · Termux: ${on ? 'ligado' : 'desligado'}</p>
+      <details><summary>Novidades das versões 1.2 e 1.3</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+        <li>Publicado no GitHub: instala como app de verdade e não depende do Termux</li>
+        <li>Instalado como app: abre mesmo com o Termux fechado</li>
+        <li>Receba prints direto do WhatsApp pelo botão compartilhar</li>
+        <li>Cópia automática no OneDrive quando o Termux está ligado; botão de envio quando não está</li></ul></details>
+    </section>
+  </div>`;
+}
+
+/* ---------- modais ---------- */
+function openModal(m) { S.modal = m; renderModal(); }
+function closeModal() { S.modal = null; renderModal(); }
+function renderModal() {
+  const m = S.modal; const el = $('#modal');
+  if (!m) { el.innerHTML = ''; return; }
+  const head = t => `<div class="sheethead"><h2>${t}</h2><button type="button" class="btn ghost sm" data-act="closeModal" aria-label="Fechar">${svg(I.x, 22)}</button></div>`;
+  let inner = '';
+  if (m.type === 'falta') {
+    const f = m.id ? items.get(m.id) || {} : {};
+    const cid = f.clienteId || m.clienteId || '';
+    const marcas = [...new Set([...faltas().map(x => x.marca), ...imps().flatMap(x => x.marcas || [])].filter(Boolean))].slice(0, 200);
+    inner = `<form class="sheet stack" data-form="falta" style="gap:14px">${head(m.id ? 'Editar falta' : 'Registrar falta')}
+      <label class="f">Cliente<select name="clienteId" class="inp"><option value="">Escolha…</option>${clientes().map(c => `<option value="${esc(c.id)}" ${c.id === cid ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</select></label>
+      <label class="f">Ou cliente novo<input name="novoCliente" class="inp" placeholder="Nome da loja (se não estiver na lista)"></label>
+      <label class="f">Código Ramada<input name="codigo" class="inp" inputmode="numeric" placeholder="Ex.: 31331" value="${esc(f.codigo || '')}"><span class="hint">É pelo código que o app reconhece a chegada no print.</span></label>
+      <label class="f">Produto<input name="produto" class="inp" placeholder="Ex.: Tubo soldável 3 m - 25 mm" value="${esc(f.produto || '')}"></label>
+      <div class="grid2"><label class="f">Marca<input name="marca" class="inp" list="dlMarcas" placeholder="Ex.: Tigre" value="${esc(f.marca || '')}"></label>
+      <label class="f">Quantidade<input name="qtd" class="inp" type="number" min="0" inputmode="numeric" value="${esc(f.qtd ?? '')}"></label></div>
+      <datalist id="dlMarcas">${marcas.map(x => `<option value="${esc(x)}"></option>`).join('')}</datalist>
+      <label class="f">Situação<select name="status" class="inp">${ORDEM.map(k => `<option value="${k}" ${(f.status || 'aguardando') === k ? 'selected' : ''}>${ST[k].label}</option>`).join('')}</select></label>
+      <label class="f">Observação<textarea name="obs" class="inp" placeholder="Ex.: aceita outra marca; precisa até dia 25">${esc(f.obs || '')}</textarea></label>
+      <button class="btn acc block" type="submit">Salvar falta</button></form>`;
+  } else if (m.type === 'cliente') {
+    const c = m.id ? items.get(m.id) || {} : {};
+    inner = `<form class="sheet stack" data-form="cliente" style="gap:14px">${head(m.id ? 'Editar cliente' : 'Novo cliente')}
+      <label class="f">Nome da loja<input name="nome" class="inp" required value="${esc(c.nome || '')}"></label>
+      <label class="f">Cidade / bairro<input name="cidade" class="inp" value="${esc(c.cidade || '')}"></label>
+      <label class="f">Comprador<input name="comprador" class="inp" value="${esc(c.comprador || '')}"></label>
+      <label class="f">Telefone / WhatsApp<input name="telefone" class="inp" type="tel" inputmode="tel" placeholder="(00) 00000-0000" value="${esc(c.telefone || '')}"></label>
+      <button class="btn acc block" type="submit">Salvar cliente</button></form>`;
+  } else if (m.type === 'faltaMenu') {
+    const f = items.get(m.id); if (!f) { S.modal = null; el.innerHTML = ''; return; }
+    const c = cli(f.clienteId) || {};
+    inner = `<div class="sheet stack">${head(esc(f.produto || f.codigo || 'Falta'))}<p class="sub" style="margin-top:-6px">${esc(c.nome || '')} · agora: ${ST[f.status].label}</p>
+      <span class="eyebrow">Mudar situação</span><div class="grid2">${ORDEM.filter(k => k !== f.status).map(k => `<button class="btn sm" data-act="st" data-id="${f.id}" data-s="${k}" data-close="1">${ST[k].label}</button>`).join('')}</div>
+      <button class="btn" data-act="editFalta" data-id="${f.id}">Editar</button>
+      <button class="btn danger" data-act="delFalta" data-id="${f.id}">Excluir falta</button>
+      ${Array.isArray(f.hist) && f.hist.length ? `<details><summary>Histórico</summary><div class="hint" style="line-height:1.7">${f.hist.slice().reverse().map(x => `${dm(x.em)} ${hm(x.em)} · ${ST[x.s] ? ST[x.s].label : x.s}${x.via === 'print' ? ' (print)' : ''}`).join('<br>')}</div></details>` : ''}</div>`;
+  } else if (m.type === 'confirm') {
+    inner = `<div class="sheet stack">${head('Tem certeza?')}<p class="sub" style="margin:0">${esc(m.text)}</p><div class="grid2"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn dangerfill" data-act="confirmYes">${esc(m.ok || 'Excluir')}</button></div></div>`;
+  } else if (m.type === 'restore') {
+    const txt = m.origem === 'onedrive' ? 'Vou buscar a última cópia (dados-atual.json) da pasta RepresentanteApp do seu OneDrive.' : m.origem === 'antigo' ? 'Vou trazer os clientes e faltas salvos pela versão 1.1 no Termux.' : `O arquivo tem ${(m.data.itens || []).length} registros${m.data.exportadoEm ? ', salvo em ' + dm(m.data.exportadoEm) : ''}.`;
+    inner = `<div class="sheet stack">${head('Restaurar backup')}<p class="sub" style="margin:0">${txt} Registros iguais são substituídos e nada é apagado.</p><div class="grid2"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn pri" data-act="restoreYes">Restaurar</button></div></div>`;
+  }
+  el.innerHTML = `<div class="ovl" data-ovl="1">${inner}</div>`;
+  const first = el.querySelector('input,select,textarea'); if (first && m.type === 'cliente') first.focus();
+}
+
+/* ---------- chegadas: leitura e cruzamento ---------- */
+function limpar(r) {
+  const produtos = (Array.isArray(r && r.produtos) ? r.produtos : []).map(p => ({ codigo: String(p.codigo ?? '').trim(), descricao: String(p.descricao ?? '').trim(), complemento: String(p.complemento ?? '').trim() })).filter(p => p.codigo || p.descricao);
+  const ms = (Array.isArray(r && r.marcas) ? r.marcas : []).map(m => typeof m === 'string' ? m : (m && (m.parceiro || m.nome)) || '').map(s => String(s).trim()).filter(Boolean);
+  return { produtos, marcas: [...new Set(ms)] };
+}
+function nomeBate(a, b) {
+  const ta = norm(a).split(' ').filter(t => t.length >= 2); if (ta.length < 2) return false;
+  const nb = ' ' + norm(b) + ' ';
+  return ta.every(t => nb.includes(' ' + t + ' ') || (t.length >= 4 && nb.includes(t)));
+}
+function casar(res, status) {
+  const alvo = ST[status].rank;
+  const abertas = faltas().filter(f => ['aguardando', 'armazenando', 'disponivel'].includes(f.status) && ST[f.status].rank < alvo);
+  const mapa = new Map(res.produtos.map(p => [normCode(p.codigo), p]).filter(([k]) => k));
+  const exatos = [], possiveis = [], marcas = [], usados = new Set();
+  for (const f of abertas) {
+    const c = normCode(f.codigo);
+    if (c && mapa.has(c)) { exatos.push({ f, p: mapa.get(c) }); usados.add(f.id); continue; }
+    if (!c && f.produto) { const p = res.produtos.find(p => nomeBate(f.produto, p.descricao + ' ' + p.complemento)); if (p) { possiveis.push({ f, p }); usados.add(f.id); } }
+  }
+  for (const f of abertas) {
+    if (usados.has(f.id) || !f.marca) continue;
+    if (normCode(f.codigo) && res.produtos.length) continue; // print de produtos: se o código não veio, o item não chegou
+    const fm = norm(f.marca); if (fm.length < 2) continue;
+    const m = res.marcas.find(m => { const nm = norm(m); return nm === fm || (' ' + nm + ' ').includes(' ' + fm + ' ') || (fm.length >= 4 && nm.includes(fm)); });
+    if (m) marcas.push({ f, m });
+  }
+  return { exatos, possiveis, marcas };
+}
+function msgErro(code) {
+  return ({
+    not_granted: 'Você não permitiu que o app use o Claude. Abra o app de novo e permita para ler os prints.',
+    sampling_disabled: 'O Claude não está disponível para esta conta agora.',
+    rate_limited: 'Muitas leituras seguidas. Espere um pouco e tente de novo.',
+    image_rejected: 'Não consegui abrir essa imagem. Tente outro print.',
+    invalid_json: 'Não consegui entender o print. Tente um print mais nítido ou cole o texto.',
+    session_expired: 'Sua sessão expirou. Entre no Claude de novo.',
+    refused: 'Não consegui ler esse conteúdo.'
+  })[code] || 'Falha ao ler. Tente de novo.';
+}
+function mostrarResultado(res) {
+  S.imp.res = res; S.imp.fase = 'pronto';
+  S.imp.match = casar(res, S.imp.status);
+  S.imp.sel = new Set(S.imp.match.exatos.map(x => x.f.id));
+}
+function carregarScript(src) {
+  return new Promise((res, rej) => { if (window.Tesseract) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('leitor indisponível')); document.head.appendChild(s); });
+}
+async function prepararImagem(file) {
+  // mesmo tratamento testado no Termux: cinza, ampliar ~3x e limiar 60%
+  const bmp = await createImageBitmap(file);
+  const esc3 = Math.max(1, Math.min(3, 2600 / bmp.width));
+  const w = Math.round(bmp.width * esc3), h = Math.round(bmp.height * esc3);
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const cx = cv.getContext('2d', { willReadFrequently: true }); cx.imageSmoothingQuality = 'high'; cx.drawImage(bmp, 0, 0, w, h);
+  const d = cx.getImageData(0, 0, w, h), p = d.data;
+  for (let i = 0; i < p.length; i += 4) { const g = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2]; const v = g < 153 ? 0 : 255; p[i] = p[i + 1] = p[i + 2] = v; }
+  cx.putImageData(d, 0, 0);
+  return cv;
+}
+let tessWorker = null;
+async function ocrNavegador(file) {
+  await carregarScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+  if (!tessWorker) {
+    tessWorker = await Tesseract.createWorker('eng', 1);
+    await tessWorker.setParameters({ tessedit_pageseg_mode: '6' });
+  }
+  const img = await prepararImagem(file);
+  const { data } = await tessWorker.recognize(img);
+  return { ...lerTextoLocal(data.text || ''), texto: data.text || '', leitor: 'navegador' };
+}
+async function ocrArquivo(file) {
+  await status();
+  if (srv.online && srv.ocr) { try { return await api('POST', '/api/ocr', file, true); } catch (e) { } }
+  return await ocrNavegador(file);
+}
+async function lerArquivos(files) {
+  S.tab = 'chegadas'; S.imp.fase = 'lendo'; S.imp.erro = null; S.imp.res = null;
+  const prods = [], marcas = [], textos = []; let falhas = 0;
+  for (let i = 0; i < files.length; i++) {
+    S.imp.progresso = (files.length > 1 ? `Lendo print ${i + 1} de ${files.length}…` : 'Lendo o print…') + (srv.online ? '' : ' Sem o Termux pode levar até 1 minuto.'); render();
+    try {
+      const r = await ocrArquivo(files[i]);
+      (r.produtos || []).forEach(p => { if (!prods.some(x => x.codigo === p.codigo)) prods.push(p); });
+      (r.marcas || []).forEach(m => { if (!marcas.some(x => norm(x) === norm(m))) marcas.push(m); });
+      if (r.texto) textos.push(r.texto.trim());
+    } catch (e) { falhas++; }
+  }
+  if (!prods.length && !marcas.length) { S.imp.fase = 'idle'; S.imp.erro = falhas ? (srv.online ? 'Não consegui ler o print. Tente de novo ou cole os códigos.' : 'Não consegui ler o print sem o Termux. Abra o Termux, digite rep e tente de novo, ou cole os códigos.') : 'Não encontrei códigos nem marcas no print. Confira se é o print certo ou cole os códigos.'; S.imp.textoLido = textos.join('\n\n'); render(); return; }
+  mostrarResultado({ ...limpar({ produtos: prods, marcas }), texto: textos.join('\n\n---\n\n') });
+  if (falhas) S.imp.erro = `${falhas} ${pl(falhas, 'print não pôde', 'prints não puderam')} ser ${pl(falhas, 'lido', 'lidos')}.`;
+  render();
+}
+function lerTextoLocal(txt) {
+  const produtos = [], marcas = [];
+  txt.split(/\n+/).forEach(bruta => {
+    const l = bruta.replace(/[|\[\]{}_]+/g, ' ').replace(/\s{2,}/g, ' ').trim(); if (!l) return;
+    let m = l.match(/^\D{0,3}?(\d{4,6})\s*(.*)$/);
+    if (m) { if (!produtos.some(p => p.codigo === m[1])) produtos.push({ codigo: m[1], descricao: m[2].trim(), complemento: '' }); return; }
+    m = l.match(/^\D{0,3}?(\d{2,3})\s+([A-Za-zÀ-ÿ].{1,})$/);
+    if (m && !marcas.some(x => norm(x) === norm(m[2]))) marcas.push(m[2].trim());
+  });
+  return { produtos, marcas };
+}
+async function aplicarImp() {
+  const im = S.imp; if (!im.res) return;
+  const ids = [...im.sel]; im.fase = 'salvando'; render();
+  let n = 0;
+  for (const id of ids) { try { await setStatus(id, im.status, 'print'); n++; } catch (e) { } }
+  try {
+    await save(newId('imp'), { kind: 'imp', em: now(), status: im.status, nProd: im.res.produtos.length, nMarcas: im.res.marcas.length, atualizadas: n, codigos: im.res.produtos.map(p => normCode(p.codigo)).filter(Boolean).slice(0, 500), marcas: im.res.marcas.slice(0, 100) });
+  } catch (e) { }
+  S.imp = { ...im, fase: 'idle', res: null, match: null, sel: new Set(), texto: '' };
+  toast(n ? `${n} ${pl(n, 'falta atualizada', 'faltas atualizadas')}` : 'Chegada registrada');
+  render();
+}
+
+/* ---------- backup ---------- */
+async function lerRestore(file) {
+  try { const j = JSON.parse(await file.text()); if (!j || !Array.isArray(j.itens)) throw 0; openModal({ type: 'restore', data: j }); }
+  catch (e) { toast('Arquivo de backup inválido.'); }
+}
+async function restaurar() {
+  const m = S.modal; closeModal(); toast('Restaurando…');
+  try {
+    let lista;
+    if (m.origem === 'onedrive') lista = (await api('GET', '/api/onedrive-dados', undefined, false, 180000)).itens;
+    else if (m.origem === 'antigo') lista = (await api('GET', '/api/antigo')).itens;
+    else lista = m.data.itens;
+    const n = await importarItens(lista); toast(`${n} registros restaurados`);
+  } catch (e) { toast('Não consegui restaurar: ' + e.message); }
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click', async e => {
+  if (e.target.matches && e.target.matches('[data-ovl]')) { closeModal(); return; }
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  try {
+    switch (act) {
+      case 'tab': S.tab = el.dataset.t; if (S.tab !== 'clientes') S.cli = null; window.scrollTo(0, 0); render(); break;
+      case 'filtro': S.filtro = el.dataset.f; S.tab = 'faltas'; render(); break;
+      case 'openCli': S.cli = id; S.tab = 'clientes'; S.nota = ''; window.scrollTo(0, 0); render(); break;
+      case 'backCli': S.cli = null; render(); break;
+      case 'novaFalta': openModal({ type: 'falta', clienteId: id || null }); break;
+      case 'editFalta': openModal({ type: 'falta', id }); break;
+      case 'novoCli': openModal({ type: 'cliente' }); break;
+      case 'editCli': openModal({ type: 'cliente', id }); break;
+      case 'faltaMenu': openModal({ type: 'faltaMenu', id }); break;
+      case 'closeModal': closeModal(); break;
+      case 'st': el.disabled = true; await setStatus(id, el.dataset.s); if (el.dataset.close) closeModal(); toast('Situação: ' + ST[el.dataset.s].label); break;
+      case 'ofertarCli': { el.disabled = true; const l = faltas().filter(f => f.clienteId === id && f.status === 'disponivel'); for (const f of l) await setStatus(f.id, 'ofertado'); toast(`${l.length} ${pl(l.length, 'marcada', 'marcadas')} como ofertado`); break; }
+      case 'delFalta': openModal({ type: 'confirm', text: 'Excluir esta falta? Isso não pode ser desfeito.', action: 'delFalta', id }); break;
+      case 'delCli': { const n = faltas().filter(f => f.clienteId === id).length; openModal({ type: 'confirm', text: `Excluir este cliente${n ? ' e suas ' + n + ' faltas' : ''}? Isso não pode ser desfeito.`, action: 'delCli', id }); break; }
+      case 'confirmYes': {
+        const m = S.modal; closeModal();
+        if (m.action === 'delFalta') { await del(m.id); toast('Falta excluída'); }
+        if (m.action === 'delCli') { for (const f of faltas().filter(f => f.clienteId === m.id)) await del(f.id); await del(m.id); S.cli = null; render(); toast('Cliente excluído'); }
+        break;
+      }
+      case 'addNota': { const t = S.nota.trim(); if (!t) { toast('Escreva a anotação primeiro'); break; } const c = cli(S.cli); const notas = [...(Array.isArray(c.notas) ? c.notas : []), { em: now(), txt: t }].slice(-200); S.nota = ''; await patch(c.id, { notas }); toast('Anotação salva'); break; }
+      case 'delNota': { const c = cli(S.cli); const notas = (c.notas || []).filter((_, i) => i !== Number(el.dataset.i)); await patch(c.id, { notas }); break; }
+      case 'impStatus': S.imp.status = el.dataset.s; if (S.imp.res) { S.imp.match = casar(S.imp.res, S.imp.status); S.imp.sel = new Set(S.imp.match.exatos.map(x => x.f.id)); } render(); break;
+      case 'impTexto': S.imp.mostraTexto = !S.imp.mostraTexto || !srv.ocr; render(); break;
+      case 'impLerTexto': {
+        const t = S.imp.texto.trim(); if (!t) { toast('Cole ou digite os códigos primeiro'); break; }
+        const res = lerTextoLocal(t);
+        if (!res.produtos.length && !res.marcas.length) { toast('Não encontrei códigos no texto'); break; }
+        S.imp.erro = null; mostrarResultado(res); render(); break;
+      }
+      case 'reconectar': S.dbErr = null; render(); init(); break;
+      case 'syncAgora': {
+        el.disabled = true; el.textContent = 'Enviando…';
+        if (!(await enviarTermux())) { toast('Termux desligado. Use “Enviar backup”.'); render(); break; }
+        const r = await api('POST', '/api/sync', undefined, false, 190000); srv = { ...r, online: true };
+        if (r.ultimoSync) { meta.ultimoOneDrive = r.ultimoSync; await metaSet('ultimoOneDrive', r.ultimoSync); }
+        render(); toast(r.ok ? 'Cópia enviada ao OneDrive' : 'Não enviou: ' + (r.erroSync || 'OneDrive não configurado')); break;
+      }
+      case 'restOne': openModal({ type: 'restore', origem: 'onedrive' }); break;
+      case 'importAntigo': openModal({ type: 'restore', origem: 'antigo' }); break;
+      case 'compartilhar': await compartilharBackup(); break;
+      case 'baixarCsv': baixar(`faltas-${hojeISO()}.csv`, new Blob([csv()], { type: 'text/csv' })); break;
+      case 'baixarJson': baixar(`backup-representante-${hojeISO()}.json`, new Blob([JSON.stringify(pacote())], { type: 'application/json' })); meta.ultimoCompartilhado = now(); await metaSet('ultimoCompartilhado', meta.ultimoCompartilhado); render(); break;
+      case 'impAplicar': await aplicarImp(); break;
+      case 'impLimpar': S.imp = { ...S.imp, fase: 'idle', res: null, match: null, sel: new Set(), erro: null }; render(); break;
+      case 'restoreYes': await restaurar(); break;
+    }
+  } catch (err) { toast('Não consegui salvar no celular. Tente de novo.'); render(); }
+});
+document.addEventListener('input', e => {
+  const k = e.target.dataset && e.target.dataset.in; if (!k) return;
+  if (k === 'impTexto') { S.imp.texto = e.target.value; return; }
+  S[k] = e.target.value;
+  if (k === 'busca' || k === 'buscaCli') render();
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.id === 'impFile' && t.files && t.files.length) { lerArquivos([...t.files].slice(0, 10)); }
+  else if (t.id === 'restFile' && t.files && t.files[0]) lerRestore(t.files[0]);
+  else if (t.dataset && t.dataset.chk) { t.checked ? S.imp.sel.add(t.dataset.chk) : S.imp.sel.delete(t.dataset.chk); const b = document.querySelector('[data-act="impAplicar"]'); if (b) { const n = S.imp.sel.size; b.textContent = n ? `Atualizar ${n} ${pl(n, 'falta', 'faltas')}` : 'Registrar chegada sem atualizar'; } }
+});
+document.addEventListener('submit', async e => {
+  const form = e.target.closest('form[data-form]'); if (!form) return;
+  e.preventDefault();
+  const fd = Object.fromEntries(new FormData(form)); const btn = form.querySelector('[type=submit]');
+  try {
+    if (form.dataset.form === 'cliente') {
+      if (!fd.nome.trim()) { toast('Informe o nome da loja'); return; }
+      btn.disabled = true;
+      const id = S.modal.id || newId('c'); const old = items.get(id) || {};
+      await save(id, { ...old, kind: 'cliente', nome: fd.nome.trim(), cidade: fd.cidade.trim(), comprador: fd.comprador.trim(), telefone: fd.telefone.trim(), notas: old.notas || [], criadoEm: old.criadoEm || now() });
+      closeModal(); toast('Cliente salvo');
+      if (!S.modal && !old.kind) { S.cli = id; S.tab = 'clientes'; render(); }
+    } else if (form.dataset.form === 'falta') {
+      let cid = fd.clienteId;
+      if (fd.novoCliente.trim()) { btn.disabled = true; cid = newId('c'); await save(cid, { kind: 'cliente', nome: fd.novoCliente.trim(), notas: [], criadoEm: now() }); }
+      if (!cid) { toast('Escolha o cliente'); btn.disabled = false; return; }
+      if (!fd.produto.trim() && !fd.codigo.trim()) { toast('Informe o produto ou o código'); btn.disabled = false; return; }
+      btn.disabled = true;
+      const id = S.modal.id || newId('f'); const old = items.get(id) || {}; const st = fd.status || 'aguardando';
+      const hist = Array.isArray(old.hist) ? old.hist.slice() : [];
+      if (!old.kind) hist.push({ s: st, em: now(), via: 'cadastro' }); else if (old.status !== st) hist.push({ s: st, em: now(), via: 'manual' });
+      await save(id, { ...old, kind: 'falta', clienteId: cid, codigo: fd.codigo.trim(), produto: fd.produto.trim(), marca: fd.marca.trim(), qtd: fd.qtd ? Number(fd.qtd) : null, obs: fd.obs.trim(), status: st, criadoEm: old.criadoEm || now(), atualizadoEm: now(), hist });
+      closeModal();
+      const c = normCode(fd.codigo); let aviso = '';
+      if (c && !old.kind) { const recente = imps().find(x => (Date.now() - new Date(x.em)) < 15 * 864e5 && (x.codigos || []).includes(c)); if (recente) aviso = ` Atenção: este código apareceu como ${ST[recente.status].label} no print de ${dm(recente.em)}.`; }
+      toast('Falta salva.' + aviso);
+    }
+  } catch (err) { if (btn) btn.disabled = false; toast('Não consegui salvar no celular. Tente de novo.'); }
+});
+
+/* ---------- início ---------- */
+async function receberCompartilhados() {
+  if (!location.search.includes('compartilhado')) return;
+  history.replaceState(null, '', location.pathname);
+  let files = null;
+  try { files = await metaGet('compartilhados'); await metaSet('compartilhados', null); } catch (e) { }
+  if (files && files.length) lerArquivos(files);
+  else { S.tab = 'chegadas'; render(); toast('Não recebi o print. Tente escolher pela galeria.'); }
+}
+async function init() {
+  render();
+  try {
+    idb = await abrirIDB();
+    await recarregar();
+    for (const k of ['pendente', 'ultimoEnvio', 'ultimoOneDrive', 'ultimoCompartilhado']) { try { const v = await metaGet(k); if (v !== undefined) meta[k] = v; } catch (e) { } }
+    S.loaded = true; S.dbErr = null;
+  } catch (e) { S.dbErr = 'idb'; render(); return; }
+  render();
+  try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (e) { }
+  await status();
+  if (srv.online && meta.pendente) await enviarTermux();
+  render();
+  receberCompartilhados();
+}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
+setInterval(async () => { if (!S.loaded) return; await status(); if (srv.online && meta.pendente) await enviarTermux(); if (S.tab === 'mais' || S.tab === 'inicio') render(); }, 30000);
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState !== 'visible' || !S.loaded) return;
+  await status(); if (srv.online && meta.pendente) await enviarTermux();
+  render();
+});
+init();
+</script>
+</body>
+</html>
