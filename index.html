@@ -120,7 +120,7 @@ a{color:var(--ol)}
 <div id="modal"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
-const VERSAO = '1.7';
+const VERSAO = '1.8';
 const PEDIDOS = false; // pedidos ficam no Mercos
 // ponte opcional no Termux (OneDrive automático e leitura de prints mais precisa)
 const PONTE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') && location.port === '8765' ? '' : 'http://127.0.0.1:8765';
@@ -162,7 +162,8 @@ const I = {
   edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
   gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
   msg: '<path d="M4 5h16v11H8l-4 4z"/>',
-  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+  upload: '<path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v5h16v-5"/>'
 };
 const svg = (p, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 
@@ -397,7 +398,7 @@ function vInicio() {
   if (!clientes().length) {
     h += `<section class="card stack"><span class="eyebrow">Comece por aqui</span>
       <p class="sub" style="margin:0">1. Cadastre seus clientes e os dias de visita.<br>2. Quando faltar um produto, registre a falta com o <b>código Ramada</b>.<br>3. Quando chegar o print no grupo da Ramada, envie em <b>Chegadas</b>: o app encontra quem estava esperando e aprende os produtos.</p>
-      <button class="btn pri" data-act="novoCli">${svg(I.plus, 20)}Cadastrar primeiro cliente</button></section>`;
+      <button class="btn pri" data-act="novoCli">${svg(I.plus, 20)}Cadastrar primeiro cliente</button>${botaoImport('clientes', 'Importar de planilha ou contatos')}</section>`;
   }
   const uc = ultimaCopia();
   if (all().length > 2 && (!uc || (Date.now() - new Date(uc)) > 3 * 864e5)) {
@@ -481,6 +482,7 @@ function vClientes() {
   return `${barra('Clientes')}
   <div class="stack">
     <label class="search">${svg(I.search, 20)}<span class="sr">Buscar cliente</span><input id="buscaC" data-in="buscaCli" type="search" placeholder="Nome, cidade ou comprador" value="${esc(S.buscaCli)}"></label>
+    ${botaoImport('clientes', 'Importar clientes (Excel, CSV ou contatos)', 'tint sm')}
     <div class="list">${list.length ? list.map(c => {
       const mine = fs.filter(f => f.clienteId === c.id);
       const d = mine.filter(f => f.status === 'disponivel').length, ab = mine.filter(f => ['aguardando', 'armazenando'].includes(f.status)).length;
@@ -592,7 +594,9 @@ function vMais() {
   </section>
   <section class="card stack" style="gap:6px"><span class="t">Representante · versão ${VERSAO}</span>
     <p class="hint" style="margin:0">${clientes().length} clientes · ${faltas().length} faltas · ${produtos().length} produtos no catálogo · Termux: ${srv.online ? 'ligado' : 'desligado'}</p>
-    <details><summary>Novidades das versões 1.4 a 1.7</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+    <details><summary>Novidades das versões 1.4 a 1.8</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+      <li>1.8: várias faltas de uma vez na visita (Enter pula de campo)</li>
+      <li>1.8: importar clientes (Excel, CSV ou contatos .vcf) e catálogo (Excel, CSV ou PDF)</li>
       <li>1.7: print do WhatsApp agora é compartilhado com o Termux (o Chrome travava)</li>
       <li>1.6: print compartilhado espera você tocar em Ler; leitura usa menos memória</li>
       <li>1.5: pedidos saíram (ficam no Mercos)</li>
@@ -617,7 +621,7 @@ function vCatalogo() {
   ps.sort((a, b) => norm(a.descricao).localeCompare(norm(b.descricao)));
   const mostra = ps.slice(0, 150);
   return `${barra('Catálogo', 'subVoltar')}<p class="sub" style="margin:-4px 0 14px">O app aprende os produtos a cada print de chegada. Ao registrar uma falta ou pedido, digite só o código.</p>
-  <div class="stack"><label class="search">${svg(I.search, 20)}<span class="sr">Buscar produto</span><input id="buscaCat" data-in="buscaCat" type="search" placeholder="Código, nome ou marca" value="${esc(S.buscaCat)}"></label>
+  <div class="stack">${botaoImport('produtos', 'Importar tabela (Excel, CSV ou PDF)', 'tint sm')}<label class="search">${svg(I.search, 20)}<span class="sr">Buscar produto</span><input id="buscaCat" data-in="buscaCat" type="search" placeholder="Código, nome ou marca" value="${esc(S.buscaCat)}"></label>
   <div class="card" style="padding:4px 16px">${mostra.length ? mostra.map(p => `<button class="linkbtn line" data-act="editProduto" data-id="${esc(p.id)}"><span style="min-width:0"><span class="t" style="display:block">${esc(p.descricao)}</span><span class="m" style="display:block">Cód. ${esc(p.codigo)}${p.marca ? ' · ' + esc(p.marca) : ''}${p.preco ? ' · ' + reais(p.preco) : ''}</span></span>${svg(I.chev, 18)}</button>`).join('') : `<div class="empty">${produtos().length ? 'Nada encontrado.' : 'Catálogo vazio. Mande um print de chegada para começar.'}</div>`}</div>
   ${ps.length > 150 ? `<p class="hint">Mostrando 150 de ${ps.length}. Use a busca.</p>` : ''}</div>`;
 }
@@ -768,6 +772,39 @@ function renderModal() {
       <div class="grid2"><label class="f">Marca<input name="marca" class="inp" value="${esc(p.marca || '')}"></label><label class="f">Último preço (R$)<input name="preco" class="inp" inputmode="decimal" value="${esc(fmtNum(p.preco))}"></label></div>
       <button class="btn pri block" type="submit">Salvar</button>
       ${m.id ? `<button class="btn danger" type="button" data-act="delProduto" data-id="${esc(m.id)}">Tirar do catálogo</button>` : ''}</form>`;
+  } else if (m.type === 'faltas') {
+    const cid = m.clienteId || '';
+    const n = m.linhas.filter(l => l.codigo.trim() || l.produto.trim()).length;
+    inner = `<form class="sheet stack" data-form="faltas" style="gap:12px">${head('Registrar faltas')}
+      <label class="f">Cliente<select name="clienteId" class="inp"><option value="">Escolha…</option>${clientes().map(c => `<option value="${esc(c.id)}" ${c.id === cid ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</select></label>
+      ${cid ? '' : `<label class="f">Ou cliente novo<input name="novoCliente" class="inp" placeholder="Nome da loja (se não estiver na lista)"></label>`}
+      <span class="hint">Digite o código e aperte Enter: o produto vem do catálogo e o cursor vai para a quantidade. Enter de novo abre o próximo item.</span>
+      ${m.linhas.map((l, i) => `<div class="pl">
+        <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr) auto;gap:8px;align-items:center">
+          <input id="fl-${i}-codigo" data-fl="${i}:codigo" class="inp" inputmode="numeric" enterkeyhint="next" placeholder="Código" value="${esc(l.codigo)}" aria-label="Código do item ${i + 1}" autocomplete="off">
+          <input id="fl-${i}-qtd" data-fl="${i}:qtd" class="inp" type="number" min="0" inputmode="numeric" enterkeyhint="next" placeholder="Qtd" value="${esc(l.qtd)}" aria-label="Quantidade do item ${i + 1}">
+          ${m.linhas.length > 1 ? `<button type="button" class="ibtn" data-act="flDel" data-i="${i}" aria-label="Remover item ${i + 1}">${svg(I.x, 18)}</button>` : '<span></span>'}</div>
+        <input id="fl-${i}-produto" data-fl="${i}:produto" class="inp" placeholder="Produto (se o código não estiver no catálogo)" value="${esc(l.produto)}" aria-label="Produto do item ${i + 1}" autocomplete="off">
+        <span class="hint" id="fl-${i}-hint">${l.marca ? 'Marca: ' + esc(l.marca) : ''}</span></div>`).join('')}
+      <button type="button" class="btn tint" data-act="flAdd">${svg(I.plus, 18)}Outro item</button>
+      <div class="grid2"><label class="f">Situação<select name="status" class="inp">${ORDEM.slice(0, 3).map(k => `<option value="${k}" ${k === 'aguardando' ? 'selected' : ''}>${ST[k].label}</option>`).join('')}</select></label>
+      <label class="f">Observação<input name="obs" class="inp" placeholder="Opcional, vale para todas"></label></div>
+      <button class="btn pri block" type="submit" id="flSalvar">Salvar ${n > 1 ? n + ' faltas' : 'falta'}</button></form>`;
+  } else if (m.type === 'importar') {
+    const header = m.temCab ? m.rows[0] : m.rows[0].map((_, i) => 'Coluna ' + letra(i));
+    const dados = m.temCab ? m.rows.slice(1) : m.rows;
+    const ex1 = dados[0] || [];
+    const res = montarImport(m);
+    const falta = CAMPOS[m.tipo].filter(([c, , obr]) => obr && !(m.map[c] >= 0)).map(([, l]) => l);
+    const amostra = res.lista.slice(0, 4);
+    inner = `<div class="sheet stack">${head(m.tipo === 'clientes' ? 'Importar clientes' : 'Importar catálogo')}
+      <p class="sub" style="margin-top:-6px">${esc(m.arq)} · ${dados.length} ${pl(dados.length, 'linha', 'linhas')}</p>
+      <label class="check" style="border:0;padding:0"><input type="checkbox" id="impCab" ${m.temCab ? 'checked' : ''}><span>A primeira linha é o cabeçalho (nomes das colunas)</span></label>
+      <span class="eyebrow">Qual coluna é cada informação?</span>
+      ${CAMPOS[m.tipo].map(([c, l, obr]) => `<label class="f" style="font-weight:500">${l}${obr ? ' *' : ''}<select class="inp" data-map="${c}"><option value="-1">— não usar —</option>${header.map((h, i) => `<option value="${i}" ${m.map[c] === i ? 'selected' : ''}>${esc(h || 'Coluna ' + letra(i))}${ex1[i] ? ' · ex.: ' + esc(String(ex1[i]).slice(0, 24)) : ''}</option>`).join('')}</select></label>`).join('')}
+      ${falta.length ? `<p class="hint" style="margin:0;color:var(--rd)">Escolha a coluna de: ${falta.join(', ')}.</p>` : `<div class="card" style="padding:12px 14px;background:var(--oll);border-color:var(--olt)"><div class="t">${m.tipo === 'clientes' ? `${res.novos} ${pl(res.novos, 'cliente novo', 'clientes novos')}${res.ja ? ` · ${res.ja} já ${pl(res.ja, 'cadastrado', 'cadastrados')} (não ${pl(res.ja, 'muda', 'mudam')})` : ''}` : `${res.novos} ${pl(res.novos, 'produto novo', 'produtos novos')}${res.ja ? ` · ${res.ja} ${pl(res.ja, 'atualizado', 'atualizados')}` : ''}`}</div>
+        ${amostra.map(x => `<div class="m">${m.tipo === 'clientes' ? esc(x.nome) + (x.cidade ? ' · ' + esc(x.cidade) : '') + (x.telefone ? ' · ' + esc(x.telefone) : '') : esc(x.codigo) + ' · ' + esc(x.descricao) + (x.marca ? ' · ' + esc(x.marca) : '') + (x.preco ? ' · ' + reais(x.preco) : '')}</div>`).join('')}${res.lista.length > 4 ? `<div class="m">… e mais ${res.lista.length - 4}</div>` : ''}</div>`}
+      <button class="btn pri block" data-act="impConfirmar" ${falta.length || !res.lista.length ? 'disabled' : ''}>Importar ${res.lista.length || ''}</button></div>`;
   } else if (m.type === 'confirm') {
     inner = `<div class="sheet stack">${head('Tem certeza?')}<p class="sub" style="margin:0">${esc(m.text)}</p><div class="grid2"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn dangerfill" data-act="confirmYes">${esc(m.ok || 'Excluir')}</button></div></div>`;
   } else if (m.type === 'restore') {
@@ -780,7 +817,188 @@ function renderModal() {
   if (!novo && sh) { sh.style.animation = 'none'; el.firstChild.style.animation = 'none'; sh.scrollTop = sc; }
   if (fid) { const f2 = document.getElementById(fid); if (f2) { f2.focus(); if (pos != null) try { f2.setSelectionRange(pos, pos); } catch (e) { } } }
   else if (novo && m.type === 'cliente') { const first = el.querySelector('input'); if (first) first.focus(); }
+  else if (novo && m.type === 'faltas' && m.clienteId) focar('fl-0-codigo');
 }
+
+/* ---------- faltas da visita (várias de uma vez) ---------- */
+function novaLinhaF() { return { codigo: '', produto: '', marca: '', qtd: '' }; }
+function focar(id) { setTimeout(() => { const e = document.getElementById(id); if (e) e.focus(); }, 30); }
+
+/* ---------- importação de clientes e catálogo ---------- */
+async function inflar(dados, metodo) {
+  if (metodo === 0) return dados;
+  const s = new Blob([dados]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(s).arrayBuffer());
+}
+async function lerZip(buf) {
+  const u = new Uint8Array(buf), dv = new DataView(buf), td = new TextDecoder(), arqs = {};
+  let eocd = -1;
+  for (let i = u.length - 22; i >= Math.max(0, u.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('o arquivo não é um Excel .xlsx');
+  const n = dv.getUint16(eocd + 10, true); let p = dv.getUint32(eocd + 16, true);
+  for (let k = 0; k < n; k++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const metodo = dv.getUint16(p + 10, true), tam = dv.getUint32(p + 20, true), ln = dv.getUint16(p + 28, true), le = dv.getUint16(p + 30, true), lc = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+    arqs[td.decode(u.subarray(p + 46, p + 46 + ln))] = { metodo, tam, off };
+    p += 46 + ln + le + lc;
+  }
+  return {
+    nomes: Object.keys(arqs),
+    async ler(nome) {
+      const a = arqs[nome]; if (!a) return null;
+      const ini = a.off + 30 + dv.getUint16(a.off + 26, true) + dv.getUint16(a.off + 28, true);
+      return td.decode(await inflar(u.subarray(ini, ini + a.tam), a.metodo));
+    }
+  };
+}
+const colIdx = l => { let n = 0; for (const ch of String(l).toUpperCase()) n = n * 26 + (ch.charCodeAt(0) - 64); return n - 1; };
+const letra = i => { let s = ''; i++; while (i > 0) { const r = (i - 1) % 26; s = String.fromCharCode(65 + r) + s; i = Math.floor((i - 1) / 26); } return s; };
+async function lerXlsx(buf) {
+  const z = await lerZip(buf), dp = new DOMParser(), xml = t => dp.parseFromString(t, 'application/xml');
+  const ss = [];
+  const sst = await z.ler('xl/sharedStrings.xml');
+  if (sst) for (const si of xml(sst).getElementsByTagName('si')) ss.push([...si.getElementsByTagName('t')].map(t => t.textContent).join(''));
+  let alvo = 'xl/worksheets/sheet1.xml';
+  try {
+    const s1 = xml(await z.ler('xl/workbook.xml')).getElementsByTagName('sheet')[0];
+    const rid = s1 && (s1.getAttribute('r:id') || s1.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id'));
+    for (const r of xml(await z.ler('xl/_rels/workbook.xml.rels')).getElementsByTagName('Relationship')) if (r.getAttribute('Id') === rid) { const t = r.getAttribute('Target'); alvo = t.startsWith('/') ? t.slice(1) : 'xl/' + t.replace(/^\.\//, ''); }
+  } catch (e) { }
+  if (!z.nomes.includes(alvo)) alvo = z.nomes.find(n => /^xl\/worksheets\/[^/]+\.xml$/.test(n));
+  if (!alvo) throw new Error('não achei a planilha dentro do arquivo');
+  const rows = [];
+  for (const row of xml(await z.ler(alvo)).getElementsByTagName('row')) {
+    const linha = [];
+    for (const c of row.getElementsByTagName('c')) {
+      const col = colIdx((c.getAttribute('r') || '').replace(/\d+/g, '')); const t = c.getAttribute('t');
+      let v = '';
+      if (t === 'inlineStr') v = [...c.getElementsByTagName('t')].map(x => x.textContent).join('');
+      else { const ve = c.getElementsByTagName('v')[0]; v = ve ? ve.textContent : ''; if (t === 's') v = ss[Number(v)] ?? ''; }
+      linha[col >= 0 ? col : linha.length] = v;
+    }
+    rows.push(Array.from(linha, x => x ?? ''));
+  }
+  return rows;
+}
+function lerCSV(txt) {
+  txt = txt.replace(/^﻿/, '');
+  const prim = txt.split(/\r?\n/)[0] || '';
+  const sep = [';', '\t', ','].map(s => [s, prim.split(s).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = []; let row = [], cel = '', q = false;
+  for (let i = 0; i < txt.length; i++) {
+    const ch = txt[i];
+    if (q) { if (ch === '"') { if (txt[i + 1] === '"') { cel += '"'; i++; } else q = false; } else cel += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === sep) { row.push(cel); cel = ''; }
+    else if (ch === '\n') { row.push(cel); rows.push(row); row = []; cel = ''; }
+    else if (ch !== '\r') cel += ch;
+  }
+  if (cel || row.length) { row.push(cel); rows.push(row); }
+  return rows.filter(r => r.some(c => String(c).trim()));
+}
+function decodQP(s) { const b = []; for (let i = 0; i < s.length; i++) { if (s[i] === '=' && /^[0-9A-F]{2}$/i.test(s.substr(i + 1, 2))) { b.push(parseInt(s.substr(i + 1, 2), 16)); i += 2; } else b.push(s.charCodeAt(i)); } return new TextDecoder().decode(new Uint8Array(b)); }
+function lerVCF(txt) {
+  const linhas = txt.replace(/=\r?\n/g, '').replace(/\r?\n[ \t]/g, '').split(/\r?\n/);
+  const rows = [['Nome', 'Comprador', 'Telefone', 'Endereço', 'Cidade']]; let c = null;
+  const val = l => { let v = l.slice(l.indexOf(':') + 1); if (/QUOTED-PRINTABLE/i.test(l.slice(0, l.indexOf(':')))) v = decodQP(v); return v.replace(/\\,/g, ',').replace(/\\;/g, ';').trim(); };
+  for (const l of linhas) {
+    const k = l.split(/[;:]/)[0].toUpperCase().replace(/^ITEM\d+\./, '');
+    if (k === 'BEGIN') c = {};
+    else if (k === 'END' && c) { const nome = c.org || c.fn; if (nome) rows.push([nome, c.org && c.fn && c.fn !== c.org ? c.fn : '', c.tel || '', c.rua || '', c.cid || '']); c = null; }
+    else if (!c) continue;
+    else if (k === 'FN') c.fn = val(l);
+    else if (k === 'ORG') c.org = val(l).split(';')[0].trim();
+    else if (k === 'TEL' && !c.tel) c.tel = val(l);
+    else if (k === 'ADR' && !c.rua) { const p = val(l).split(';'); c.rua = [p[2], p[1]].filter(Boolean).join(' ').trim(); c.cid = (p[3] || '').trim(); }
+  }
+  return rows;
+}
+async function lerPDF(buf) {
+  await carregarScript('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js', 'pdfjsLib');
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const rows = [['Código', 'Descrição', 'Preço']];
+  for (let pg = 1; pg <= pdf.numPages; pg++) {
+    const tc = await (await pdf.getPage(pg)).getTextContent();
+    const ls = new Map();
+    tc.items.forEach(it => { const y = Math.round(it.transform[5]); const k = [...ls.keys()].find(z => Math.abs(z - y) <= 2) ?? y; if (!ls.has(k)) ls.set(k, []); ls.get(k).push(it); });
+    [...ls.entries()].sort((a, b) => b[0] - a[0]).forEach(([, its]) => {
+      const t = its.sort((a, b) => a.transform[4] - b.transform[4]).map(i => i.str).join(' ').replace(/\s+/g, ' ').trim();
+      const m = t.match(/^\D{0,3}?(\d{4,6})\s+(.+?)(?:\s+R?\$?\s*(\d{1,3}(?:\.\d{3})*,\d{2}))?\s*$/);
+      if (m) rows.push([m[1], m[2].trim(), m[3] || '']);
+    });
+  }
+  return rows;
+}
+const CAMPOS = {
+  clientes: [['nome', 'Nome da loja', 1], ['comprador', 'Comprador'], ['telefone', 'Telefone'], ['endereco', 'Endereço'], ['bairro', 'Bairro'], ['cidade', 'Cidade']],
+  produtos: [['codigo', 'Código', 1], ['descricao', 'Descrição', 1], ['marca', 'Marca'], ['preco', 'Preço']]
+};
+const PISTAS = {
+  nome: ['NOME FANTASIA', 'FANTASIA', 'NOME', 'RAZAO SOCIAL', 'RAZAO', 'CLIENTE', 'EMPRESA', 'LOJA'], comprador: ['COMPRADOR', 'CONTATO', 'RESPONSAVEL'],
+  telefone: ['WHATSAPP', 'CELULAR', 'TELEFONE', 'FONE', 'TEL'], endereco: ['ENDERECO', 'LOGRADOURO', 'RUA'], bairro: ['BAIRRO'], cidade: ['CIDADE', 'MUNICIPIO'],
+  codigo: ['CODIGO', 'COD', 'REFERENCIA', 'REF', 'SKU'], descricao: ['DESCRICAO', 'PRODUTO', 'NOME', 'ITEM'], marca: ['MARCA', 'FABRICANTE', 'FORNECEDOR'], preco: ['PRECO', 'VALOR', 'UNITARIO']
+};
+function adivinhar(tipo, header) {
+  const h = header.map(norm), map = {}, usados = new Set();
+  for (const [campo] of CAMPOS[tipo]) {
+    let achou = -1;
+    for (const p of PISTAS[campo]) { const i = h.findIndex((x, j) => !usados.has(j) && x && (x === p || x.split(' ').includes(p) || x.startsWith(p + ' '))); if (i >= 0) { achou = i; break; } }
+    map[campo] = achou; if (achou >= 0) usados.add(achou);
+  }
+  return map;
+}
+function semCabecalho(tipo, rows) {
+  const cols = rows[0].length, amostra = rows.slice(0, 50), map = {};
+  CAMPOS[tipo].forEach(([c]) => map[c] = -1);
+  if (tipo === 'clientes') { map.nome = 0; return map; }
+  const frac = (i, re) => amostra.filter(r => re.test(String(r[i] || '').trim())).length / amostra.length;
+  for (let i = 0; i < cols; i++) if (map.codigo < 0 && frac(i, /^\d{3,7}$/) > .6) map.codigo = i;
+  let melhor = -1, tam = 0;
+  for (let i = 0; i < cols; i++) { if (i === map.codigo) continue; const m = amostra.reduce((s, r) => s + String(r[i] || '').length, 0) / amostra.length; if (m > tam) { tam = m; melhor = i; } }
+  map.descricao = melhor;
+  for (let i = 0; i < cols; i++) if (map.preco < 0 && i !== map.codigo && i !== map.descricao && frac(i, /^R?\$?\s*\d+([.,]\d{1,2})?$/) > .6) map.preco = i;
+  return map;
+}
+const precoTxt = s => { s = String(s || '').replace(/[R$\s]/g, ''); if (!s) return null; if (/^\d+(\.\d+)?$/.test(s)) return parseFloat(s); const v = numBR(s); return v || null; };
+function montarImport(m) {
+  const linhas = m.temCab ? m.rows.slice(1) : m.rows;
+  const g = (r, c) => m.map[c] >= 0 ? String(r[m.map[c]] ?? '').trim() : '';
+  if (m.tipo === 'clientes') {
+    const ex = new Set(clientes().map(c => norm(c.nome))), vistos = new Set(), lista = []; let ja = 0;
+    for (const r of linhas) {
+      const nome = g(r, 'nome'); if (!nome) continue; const k = norm(nome);
+      if (ex.has(k)) { ja++; continue; } if (vistos.has(k)) continue; vistos.add(k);
+      lista.push({ id: newId('c'), kind: 'cliente', nome, comprador: g(r, 'comprador'), telefone: g(r, 'telefone'), endereco: [g(r, 'endereco'), g(r, 'bairro')].filter(Boolean).join(' - '), cidade: g(r, 'cidade'), diasVisita: [], freq: null, notas: [], visitas: [], criadoEm: now(), importado: true });
+    }
+    return { lista, ja, novos: lista.length };
+  }
+  const lista = [], vistos = new Set(); let ja = 0, novos = 0;
+  for (const r of linhas) {
+    const k = normCode(g(r, 'codigo')), d = g(r, 'descricao'); if (!k || !d || vistos.has(k)) continue; vistos.add(k);
+    const ex = items.get('p_' + k); ex ? ja++ : novos++;
+    lista.push({ ...(ex || {}), id: 'p_' + k, kind: 'produto', codigo: k, descricao: ex && ex.manual ? ex.descricao : d, marca: g(r, 'marca') || (ex && ex.marca) || '', preco: precoTxt(g(r, 'preco')) || (ex && ex.preco) || null, aprendidoEm: (ex && ex.aprendidoEm) || now(), importado: true });
+  }
+  return { lista, ja, novos };
+}
+async function abrirImport(file, tipo) {
+  try {
+    toast('Lendo arquivo…');
+    const nome = file.name.toLowerCase(); let rows;
+    if (nome.endsWith('.xls')) throw new Error('arquivo .xls antigo. Abra no Excel ou Planilhas e salve como .xlsx ou .csv');
+    if (nome.endsWith('.xlsx')) rows = await lerXlsx(await file.arrayBuffer());
+    else if (nome.endsWith('.vcf')) rows = lerVCF(await file.text());
+    else if (nome.endsWith('.pdf')) rows = await lerPDF(await file.arrayBuffer());
+    else rows = lerCSV(await file.text());
+    rows = (rows || []).filter(r => r.some(c => String(c ?? '').trim()));
+    if (rows.length < 1) throw new Error('não achei linhas com dados');
+    const larg = Math.max(...rows.map(r => r.length)); rows = rows.map(r => Array.from({ length: larg }, (_, i) => String(r[i] ?? '')));
+    const g = adivinhar(tipo, rows[0]); const temCab = Object.values(g).some(v => v >= 0);
+    $('#toast').style.display = 'none';
+    openModal({ type: 'importar', tipo, arq: file.name, rows, temCab, map: temCab ? g : semCabecalho(tipo, rows) });
+  } catch (e) { const pdf = /\.pdf$/i.test(file.name); toast('Não consegui ler: ' + (pdf && /indispon/.test(e && e.message) ? 'para ler PDF o app precisa de internet (na primeira vez). Tente de novo com internet ou use Excel/CSV.' : (e && e.message || 'arquivo inválido'))); }
+}
+const botaoImport = (tipo, texto, cls) => `<label class="btn ${cls || 'tint'}" style="cursor:pointer">${svg(I.upload, 18)}${texto}<input type="file" data-imp="${tipo}" accept="${tipo === 'clientes' ? '.xlsx,.csv,.txt,.vcf' : '.xlsx,.csv,.txt,.pdf'}" class="sr"></label>`;
 
 /* ---------- catálogo: autopreenchimento ---------- */
 function buscaProdutos(txt, n = 6) {
@@ -832,8 +1050,8 @@ function mostrarResultado(res) {
   S.imp.match = casar(res, S.imp.status);
   S.imp.sel = new Set(S.imp.match.exatos.map(x => x.f.id));
 }
-function carregarScript(src) {
-  return new Promise((res, rej) => { if (window.Tesseract) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('leitor indisponível')); document.head.appendChild(s); });
+function carregarScript(src, global) {
+  return new Promise((res, rej) => { if (window[global || 'Tesseract']) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('leitor indisponível')); document.head.appendChild(s); });
 }
 async function prepararImagem(file) {
   // mesmo tratamento testado no Termux: cinza, ampliar ~3x e limiar 60%
@@ -976,7 +1194,10 @@ document.addEventListener('click', async e => {
       case 'openCli': S.cli = id; S.tab = 'clientes'; S.cliTab = 'faltas'; S.nota = ''; window.scrollTo(0, 0); render(); break;
       case 'backCli': S.cli = null; render(); break;
       case 'cliTab': S.cliTab = el.dataset.t; render(); break;
-      case 'novaFalta': openModal({ type: 'falta', clienteId: id || null }); break;
+      case 'novaFalta': openModal({ type: 'faltas', clienteId: id || null, linhas: [novaLinhaF()] }); break;
+      case 'flAdd': S.modal.linhas.push(novaLinhaF()); renderModal(); focar(`fl-${S.modal.linhas.length - 1}-codigo`); break;
+      case 'flDel': S.modal.linhas.splice(Number(el.dataset.i), 1); renderModal(); break;
+      case 'impConfirmar': { const r = montarImport(S.modal); if (!r.lista.length) break; el.disabled = true; await saveMany(r.lista); const tipo = S.modal.tipo; closeModal(); vibrar(); toast(tipo === 'clientes' ? `${r.novos} ${pl(r.novos, 'cliente importado', 'clientes importados')}` : `${r.lista.length} ${pl(r.lista.length, 'produto', 'produtos')} no catálogo`); break; }
       case 'editFalta': openModal({ type: 'falta', id }); break;
       case 'novoCli': openModal({ type: 'cliente' }); break;
       case 'editCli': openModal({ type: 'cliente', id }); break;
@@ -1058,6 +1279,18 @@ document.addEventListener('click', async e => {
 });
 document.addEventListener('input', e => {
   const t = e.target;
+  // faltas da visita
+  if (t.dataset && t.dataset.fl && S.modal && S.modal.type === 'faltas') {
+    const [i, campo] = t.dataset.fl.split(':'); const l = S.modal.linhas[Number(i)]; if (!l) return;
+    l[campo] = t.value;
+    if (campo === 'codigo') {
+      const p = prodPorCodigo(t.value); const hh = document.getElementById(`fl-${i}-hint`);
+      if (p) { l.produto = p.descricao; l.marca = p.marca || ''; const pe = document.getElementById(`fl-${i}-produto`); if (pe) pe.value = p.descricao; if (hh) hh.textContent = '✓ do catálogo' + (p.marca ? ' · ' + p.marca : ''); }
+      else if (hh) hh.textContent = t.value.length >= 4 && produtos().length ? 'Fora do catálogo: escreva o nome do produto.' : '';
+    }
+    const n = S.modal.linhas.filter(x => x.codigo.trim() || x.produto.trim()).length; const b = $('#flSalvar'); if (b) b.textContent = 'Salvar ' + (n > 1 ? n + ' faltas' : 'falta');
+    return;
+  }
   // itens do pedido
   if (t.dataset && t.dataset.pl && S.modal && S.modal.type === 'pedido') {
     const [i, campo] = t.dataset.pl.split(':'); const l = S.modal.linhas[Number(i)]; if (!l) return;
@@ -1089,10 +1322,21 @@ document.addEventListener('input', e => {
   S[k] = t.value;
   if (k === 'busca' || k === 'buscaCli' || k === 'buscaCat') render();
 });
+document.addEventListener('keydown', e => {
+  const t = e.target; if (e.key !== 'Enter' || !t.dataset || !t.dataset.fl || !S.modal || S.modal.type !== 'faltas') return;
+  e.preventDefault();
+  const [i, campo] = t.dataset.fl.split(':'); const n = Number(i);
+  if (campo === 'codigo') focar(`fl-${n}-qtd`);
+  else if (n === S.modal.linhas.length - 1) { if (S.modal.linhas[n].codigo.trim() || S.modal.linhas[n].produto.trim()) { S.modal.linhas.push(novaLinhaF()); renderModal(); focar(`fl-${n + 1}-codigo`); } }
+  else focar(`fl-${n + 1}-codigo`);
+});
 document.addEventListener('change', e => {
   const t = e.target;
   if (t.id === 'impFile' && t.files && t.files.length) { lerArquivos([...t.files].slice(0, 10)); }
   else if (t.id === 'restFile' && t.files && t.files[0]) lerRestore(t.files[0]);
+  else if (t.dataset && t.dataset.imp && t.files && t.files[0]) { abrirImport(t.files[0], t.dataset.imp); t.value = ''; }
+  else if (t.dataset && t.dataset.map && S.modal && S.modal.type === 'importar') { S.modal.map[t.dataset.map] = Number(t.value); renderModal(); }
+  else if (t.id === 'impCab' && S.modal && S.modal.type === 'importar') { S.modal.temCab = t.checked; S.modal.map = t.checked ? adivinhar(S.modal.tipo, S.modal.rows[0]) : semCabecalho(S.modal.tipo, S.modal.rows); renderModal(); }
   else if (t.dataset && t.dataset.chk) { t.checked ? S.imp.sel.add(t.dataset.chk) : S.imp.sel.delete(t.dataset.chk); const b = document.querySelector('[data-act="impAplicar"]'); if (b) { const n = S.imp.sel.size; b.textContent = n ? `Atualizar ${n} ${pl(n, 'falta', 'faltas')}` : 'Registrar chegada'; } }
 });
 document.addEventListener('submit', async e => {
@@ -1125,6 +1369,26 @@ document.addEventListener('submit', async e => {
       let aviso = '';
       if (c && !old.kind) { const recente = imps().find(x => (Date.now() - new Date(x.em)) < 15 * 864e5 && (x.codigos || []).includes(c)); if (recente) aviso = ` Atenção: este código apareceu como ${ST[recente.status].label} no print de ${dm(recente.em)}.`; }
       toast('Falta salva.' + aviso);
+    } else if (tipo === 'faltas') {
+      let cid = o.clienteId;
+      const linhas = S.modal.linhas.filter(l => l.codigo.trim() || l.produto.trim());
+      if (!linhas.length) { toast('Digite pelo menos um código ou produto'); return; }
+      if (o.novoCliente && o.novoCliente.trim()) { btn.disabled = true; cid = newId('c'); await save(cid, { kind: 'cliente', nome: o.novoCliente.trim(), notas: [], visitas: [], diasVisita: [], criadoEm: now() }, true); }
+      if (!cid) { toast('Escolha o cliente'); btn.disabled = false; return; }
+      btn.disabled = true;
+      const st = o.status || 'aguardando', lista = [], recentes = imps().filter(x => (Date.now() - new Date(x.em)) < 15 * 864e5);
+      let jaChegou = 0;
+      for (const l of linhas) {
+        const c = normCode(l.codigo), p = c ? prodPorCodigo(c) : null;
+        const produto = l.produto.trim() || (p ? p.descricao : '');
+        lista.push({ id: newId('f'), kind: 'falta', clienteId: cid, codigo: l.codigo.trim(), produto, marca: l.marca || (p && p.marca) || '', qtd: l.qtd ? Number(l.qtd) : null, obs: (o.obs || '').trim(), status: st, criadoEm: now(), atualizadoEm: now(), hist: [{ s: st, em: now(), via: 'cadastro' }] });
+        if (c && produto && !p) lista.push({ id: 'p_' + c, kind: 'produto', codigo: c, descricao: produto, marca: '', manual: true, aprendidoEm: now() });
+        if (c && recentes.some(x => (x.codigos || []).includes(c))) jaChegou++;
+        await new Promise(r => setTimeout(r, 2)); // ids únicos
+      }
+      await saveMany(lista);
+      closeModal(); vibrar();
+      toast(`${linhas.length} ${pl(linhas.length, 'falta salva', 'faltas salvas')}.` + (jaChegou ? ` Atenção: ${jaChegou} ${pl(jaChegou, 'código já apareceu', 'códigos já apareceram')} num print de chegada recente.` : ''));
     } else if (tipo === 'visita') {
       btn.disabled = true; await marcarVisita(S.modal.id, (o.obs || '').trim()); closeModal(); toast('Visita registrada');
     } else if (tipo === 'pedido') {
