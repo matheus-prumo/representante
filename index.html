@@ -120,7 +120,7 @@ a{color:var(--ol)}
 <div id="modal"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
-const VERSAO = '1.6';
+const VERSAO = '1.7';
 const PEDIDOS = false; // pedidos ficam no Mercos
 // ponte opcional no Termux (OneDrive automático e leitura de prints mais precisa)
 const PONTE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') && location.port === '8765' ? '' : 'http://127.0.0.1:8765';
@@ -403,6 +403,8 @@ function vInicio() {
   if (all().length > 2 && (!uc || (Date.now() - new Date(uc)) > 3 * 864e5)) {
     h += `<button class="card linkbtn row" data-act="irBackup" style="justify-content:space-between;flex-wrap:nowrap;border-color:#EADFA8;background:#FBF8E8"><span><span class="t" style="display:block">Faça a cópia no OneDrive</span><span class="m" style="display:block">Última cópia: ${uc ? dm(uc) : 'nunca'}. Seus dados estão só neste celular.</span></span>${svg(I.chev, 20)}</button>`;
   }
+  if (srv.online && srv.recebidos && !(S.imp.pendentes || []).length) h += `<button class="card linkbtn row" data-act="verRecebidos" style="justify-content:space-between;flex-wrap:nowrap;background:var(--oll);border-color:var(--olt)"><span><span class="t" style="display:block">${srv.recebidos} ${pl(srv.recebidos, 'print recebido', 'prints recebidos')} pelo Termux</span><span class="m" style="display:block">Toque para ler em Chegadas</span></span>${svg(I.chev, 20)}</button>`;
+  if ((S.imp.pendentes || []).length) h += `<button class="card linkbtn row" data-act="tab" data-t="chegadas" style="justify-content:space-between;flex-wrap:nowrap;background:var(--oll);border-color:var(--olt)"><span><span class="t" style="display:block">${S.imp.pendentes.length} ${pl(S.imp.pendentes.length, 'print esperando', 'prints esperando')} leitura</span><span class="m" style="display:block">Toque para ler em Chegadas</span></span>${svg(I.chev, 20)}</button>`;
   // roteiro
   const rot = roteiro(); const rl = rot ? (rot.clientes || []).filter(id => cli(id)) : [];
   if (clientes().length) {
@@ -545,9 +547,9 @@ function vChegadas() {
       <button data-act="impStatus" data-s="disponivel" aria-pressed="${im.status === 'disponivel'}">Disponível p/ venda</button>
     </div>
     <span class="eyebrow" style="margin-top:6px">2. Envie o print</span>
-    ${im.pendentes && im.pendentes.length ? `<div class="card" style="background:var(--oll);border-color:var(--olt)"><div class="t">${im.pendentes.length} ${pl(im.pendentes.length, 'print recebido', 'prints recebidos')} do WhatsApp</div><p class="hint" style="margin:4px 0 10px">Confira a situação acima e toque em Ler.</p><div class="grid2"><button class="btn pri" data-act="lerPendentes">Ler agora</button><button class="btn" data-act="descartarPendentes">Descartar</button></div></div>` : ''}
+    ${im.pendentes && im.pendentes.length ? `<div class="card" style="background:var(--oll);border-color:var(--olt)"><div class="t">${im.pendentes.length} ${pl(im.pendentes.length, 'print recebido', 'prints recebidos')}</div><p class="hint" style="margin:4px 0 10px">Confira a situação acima e toque em Ler.</p><div class="grid2"><button class="btn pri" data-act="lerPendentes">Ler agora</button><button class="btn" data-act="descartarPendentes">Descartar</button></div></div>` : ''}
     <label class="btn ${im.pendentes && im.pendentes.length ? '' : 'pri '}block" style="cursor:pointer">${svg(I.image, 20)}Escolher print(s) da galeria<input id="impFile" type="file" accept="image/*" multiple class="sr"></label>
-    <span class="hint">Dica: no WhatsApp, abra o print, toque em compartilhar e escolha <b>Representante</b>.</span>
+    <span class="hint">Mais rápido: no WhatsApp, abra o print, toque em compartilhar e escolha <b>Termux</b>. O app abre com o print pronto para ler.</span>
     <button class="btn ghost sm" data-act="impTexto" style="align-self:flex-start">${im.mostraTexto ? 'Fechar texto' : 'Ou colar/digitar códigos'}</button>
     ${im.mostraTexto ? `<label class="f"><span class="sr">Texto da mensagem</span><textarea id="impTxt" data-in="impTexto" class="inp" placeholder="Um código por linha, ou cole a lista">${esc(im.texto)}</textarea></label><button class="btn" data-act="impLerTexto">Ler texto</button>` : ''}
   </section>`;
@@ -590,8 +592,9 @@ function vMais() {
   </section>
   <section class="card stack" style="gap:6px"><span class="t">Representante · versão ${VERSAO}</span>
     <p class="hint" style="margin:0">${clientes().length} clientes · ${faltas().length} faltas · ${produtos().length} produtos no catálogo · Termux: ${srv.online ? 'ligado' : 'desligado'}</p>
-    <details><summary>Novidades das versões 1.4 a 1.6</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
-      <li>1.6: print compartilhado do WhatsApp espera você tocar em Ler; leitura usa menos memória</li>
+    <details><summary>Novidades das versões 1.4 a 1.7</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+      <li>1.7: print do WhatsApp agora é compartilhado com o Termux (o Chrome travava)</li>
+      <li>1.6: print compartilhado espera você tocar em Ler; leitura usa menos memória</li>
       <li>1.5: pedidos saíram (ficam no Mercos)</li>
       <li>1.5: atalhos “Copiar código” e “Tem no Mercos” em cada falta</li>
       <li>1.5: endereço do cliente, rota do dia no Maps e roteiro de amanhã</li>
@@ -860,13 +863,14 @@ async function ocrNavegador(file) {
   } finally { img.width = img.height = 0; }
 }
 async function ocrArquivo(file) {
+  if (file && file.termux) return await api('POST', '/api/recebidos/ler', { nome: file.termux });
   await status();
   if (srv.online && srv.ocr) { try { return await api('POST', '/api/ocr', file, true); } catch (e) { } }
   return await ocrNavegador(file);
 }
 async function lerArquivos(files) {
   S.tab = 'chegadas'; S.imp.fase = 'lendo'; S.imp.erro = null; S.imp.res = null;
-  const prods = [], marcas = [], textos = []; let falhas = 0;
+  const prods = [], marcas = [], textos = [], lidosTermux = []; let falhas = 0;
   for (let i = 0; i < files.length; i++) {
     S.imp.progresso = (files.length > 1 ? `Lendo print ${i + 1} de ${files.length}…` : 'Lendo o print…') + (srv.online ? '' : ' Sem o Termux pode levar até 1 minuto.'); render();
     try {
@@ -874,8 +878,10 @@ async function lerArquivos(files) {
       (r.produtos || []).forEach(p => { if (!prods.some(x => x.codigo === p.codigo)) prods.push(p); });
       (r.marcas || []).forEach(m => { if (!marcas.some(x => norm(x) === norm(m))) marcas.push(m); });
       if (r.texto) textos.push(r.texto.trim());
+      if (files[i] && files[i].termux) lidosTermux.push(files[i].termux);
     } catch (e) { falhas++; }
   }
+  if (lidosTermux.length) api('POST', '/api/recebidos/apagar', { nomes: lidosTermux }).then(() => status()).catch(() => { });
   if (tessWorker) { try { await tessWorker.terminate(); } catch (e) { } tessWorker = null; }
   if (!prods.length && !marcas.length) { S.imp.fase = 'idle'; S.imp.erro = falhas ? (srv.online ? 'Não consegui ler o print. Tente de novo ou digite os códigos.' : 'Não consegui ler o print sem o Termux. Abra o Termux, digite rep e tente de novo, ou digite os códigos.') : 'Não encontrei códigos nem marcas no print. Confira se é o print certo ou digite os códigos.'; render(); return; }
   mostrarResultado({ ...limpar({ produtos: prods, marcas }), texto: textos.join('\n\n---\n\n') });
@@ -1029,7 +1035,8 @@ document.addEventListener('click', async e => {
       }
       case 'impAplicar': await aplicarImp(); break;
       case 'lerPendentes': { const fs2 = S.imp.pendentes || []; S.imp.pendentes = null; if (fs2.length) await lerArquivos(fs2); break; }
-      case 'descartarPendentes': S.imp.pendentes = null; render(); break;
+      case 'descartarPendentes': { const tx = (S.imp.pendentes || []).filter(f => f.termux).map(f => f.termux); S.imp.pendentes = null; if (tx.length) { await api('POST', '/api/recebidos/apagar', { nomes: tx }).catch(() => { }); await status(); } render(); break; }
+      case 'verRecebidos': await carregarRecebidos(true); break;
       case 'impLimpar': S.imp = { ...S.imp, fase: 'idle', res: null, match: null, sel: new Set(), erro: null }; render(); break;
       // backup
       case 'reconectar': S.dbErr = null; render(); init(); break;
@@ -1156,6 +1163,17 @@ async function receberCompartilhados() {
   if (files && files.length) { S.imp = { ...S.imp, pendentes: [...files].slice(0, 10), fase: 'idle', res: null, erro: null }; render(); }
   else { render(); toast('Não recebi o print. Tente escolher pela galeria.'); }
 }
+async function carregarRecebidos(irPara) {
+  try {
+    const j = await api('GET', '/api/recebidos', undefined, false, 4000);
+    const novos = (j.recebidos || []).map(n => ({ termux: n }));
+    const ja = new Set((S.imp.pendentes || []).filter(f => f.termux).map(f => f.termux));
+    const add = novos.filter(f => !ja.has(f.termux));
+    if (add.length) S.imp = { ...S.imp, pendentes: [...(S.imp.pendentes || []), ...add], fase: S.imp.fase === 'lendo' ? 'lendo' : 'idle' };
+    if (irPara && (S.imp.pendentes || []).length) { S.tab = 'chegadas'; S.cli = null; S.sub = null; window.scrollTo(0, 0); }
+    render();
+  } catch (e) { }
+}
 async function init() {
   render();
   try {
@@ -1170,12 +1188,15 @@ async function init() {
   if (srv.online && meta.pendente) await enviarTermux();
   render();
   receberCompartilhados();
+  if (srv.online && srv.recebidos) await carregarRecebidos(location.search.includes('termux'));
+  if (location.search.includes('termux')) history.replaceState(null, '', location.pathname);
 }
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
 setInterval(async () => { if (!S.loaded) return; await status(); if (srv.online && meta.pendente) await enviarTermux(); if (S.tab === 'inicio' || (S.tab === 'mais' && S.sub === 'backup')) { if (!S.modal) render(); } }, 30000);
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState !== 'visible' || !S.loaded) return;
   await status(); if (srv.online && meta.pendente) await enviarTermux();
+  if (srv.online && srv.recebidos) await carregarRecebidos(true);
   if (!S.modal) render();
 });
 init();

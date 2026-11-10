@@ -24,16 +24,19 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote, urlparse
 
-VERSAO = "1.3"
+VERSAO = "1.4"
 BASE = os.path.dirname(os.path.abspath(__file__))
 HOME = os.path.expanduser("~")
 DADOS = os.environ.get("REP_DADOS", os.path.join(HOME, "rep-app-dados"))
 BACKUPS = os.path.join(DADOS, "backups")
+RECEBIDOS = os.path.join(DADOS, "recebidos")  # prints compartilhados do WhatsApp para o Termux
+RE_NOME = re.compile(r"^[A-Za-z0-9_.-]{1,120}$")
 DB_ANTIGO = os.path.join(DADOS, "dados.db")  # da versão 1.1
 PORTA = int(os.environ.get("REP_PORTA", "8765"))
 REMOTO = os.environ.get("REP_ONEDRIVE", "onedrive:RepresentanteApp")
 PASTA_CELULAR = os.path.join(HOME, "storage", "shared", "Documents", "RepresentanteApp")
 os.makedirs(BACKUPS, exist_ok=True)
+os.makedirs(RECEBIDOS, exist_ok=True)
 
 ST_LABEL = {
     "aguardando": "Aguardando", "armazenando": "Armazenando", "disponivel": "Disponível",
@@ -176,7 +179,21 @@ def status():
     return {"versao": VERSAO, "onedrive": remoto_ok(), "remoto": REMOTO, "ultimoSync": estado["ultimoSync"],
             "erroSync": estado["erroSync"], "pendente": estado["pendente"], "ultimoRecebido": estado["ultimoRecebido"],
             "ocr": bool(shutil.which("tesseract")), "melhoraImagem": bool(shutil.which("magick") or shutil.which("convert")),
-            "pastaCelular": os.path.isdir(os.path.join(HOME, "storage", "shared")), "temAntigo": os.path.exists(DB_ANTIGO)}
+            "pastaCelular": os.path.isdir(os.path.join(HOME, "storage", "shared")), "temAntigo": os.path.exists(DB_ANTIGO),
+            "recebidos": len(listar_recebidos())}
+
+
+def listar_recebidos():
+    try:
+        return sorted(f for f in os.listdir(RECEBIDOS) if RE_NOME.match(f) and os.path.isfile(os.path.join(RECEBIDOS, f)))
+    except OSError:
+        return []
+
+
+def caminho_recebido(nome):
+    if not isinstance(nome, str) or not RE_NOME.match(nome) or nome not in listar_recebidos():
+        raise ValueError("print não encontrado")
+    return os.path.join(RECEBIDOS, nome)
 
 
 # ---------------- leitura dos prints ----------------
@@ -322,6 +339,8 @@ class App(BaseHTTPRequestHandler):
                 return self._json(status())
             if p == "/api/onedrive-dados":
                 return self._json(dados_onedrive())
+            if p == "/api/recebidos":
+                return self._json({"recebidos": listar_recebidos()})
             if p == "/api/antigo":
                 return self._json({"itens": dados_antigos()})
             return self._json({"erro": "não encontrado"}, 404)
@@ -342,6 +361,23 @@ class App(BaseHTTPRequestHandler):
             if p == "/api/sync":
                 ok = enviar_onedrive()
                 return self._json(dict(status(), ok=ok))
+            if p == "/api/recebidos/ler":
+                corpo = json.loads(self._corpo(4096) or b"{}")
+                arq = caminho_recebido(corpo.get("nome"))
+                with open(arq, "rb") as fh:
+                    dados = fh.read()
+                tipo = "image/png" if arq.lower().endswith(".png") else "image/webp" if arq.lower().endswith(".webp") else "image/jpeg"
+                return self._json(ler_imagem(dados, tipo))
+            if p == "/api/recebidos/apagar":
+                corpo = json.loads(self._corpo(65536) or b"{}")
+                n = 0
+                for nome in corpo.get("nomes") or []:
+                    try:
+                        os.remove(caminho_recebido(nome))
+                        n += 1
+                    except (ValueError, OSError):
+                        pass
+                return self._json({"apagados": n})
             if p == "/api/ocr":
                 dados = self._corpo()
                 if not dados:
