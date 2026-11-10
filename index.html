@@ -120,7 +120,7 @@ a{color:var(--ol)}
 <div id="modal"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
-const VERSAO = '1.8';
+const VERSAO = '1.9';
 const PEDIDOS = false; // pedidos ficam no Mercos
 // ponte opcional no Termux (OneDrive automático e leitura de prints mais precisa)
 const PONTE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') && location.port === '8765' ? '' : 'http://127.0.0.1:8765';
@@ -170,7 +170,7 @@ const svg = (p, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" 
 let srv = { online: false, onedrive: false, ultimoSync: null, erroSync: null, ocr: false, versao: VERSAO };
 const items = new Map();
 const S = {
-  tab: 'inicio', sub: null, cli: null, cliTab: 'faltas', filtro: 'disponivel', busca: '', buscaCli: '', buscaCat: '', nota: '',
+  tab: 'inicio', sub: null, cli: null, cliTab: 'faltas', faltaModo: 'lista', rotData: null, rotEditar: false, buscaRot: '', filtro: 'disponivel', busca: '', buscaCli: '', buscaCat: '', nota: '',
   loaded: false, dbErr: null, modal: null,
   imp: { status: 'disponivel', fase: 'idle', res: null, match: null, sel: new Set(), erro: null, texto: '', mostraTexto: false, progresso: '' }
 };
@@ -340,7 +340,7 @@ function render() {
   let body;
   if (S.dbErr) body = `${barra('Representante')}<div class="card stack"><h2>Não consegui abrir seus dados</h2><p class="sub">O armazenamento do navegador está bloqueado ou cheio. Feche o app e abra de novo. Se continuar, me avise antes de limpar qualquer dado do Chrome.</p><button class="btn pri" data-act="reconectar">Tentar de novo</button></div>`;
   else if (!S.loaded) body = `${barra('Representante')}<div class="card row" style="gap:12px"><div class="spin"></div><span>Carregando seus dados…</span></div>`;
-  else body = ({ inicio: vInicio, faltas: vFaltas, chegadas: vChegadas, clientes: vClientes, mais: vMais }[S.tab])();
+  else body = ({ inicio: vInicio, faltas: vFaltas, chegadas: vChegadas, clientes: vClientes, roteiro: vRoteiro, mais: vMais }[S.tab])();
   $('#app').innerHTML = body + vNav() + vFab();
   if (fid) { const el = document.getElementById(fid); if (el) { el.focus(); if (pos != null) try { el.setSelectionRange(pos, pos); } catch (e) { } } }
 }
@@ -349,8 +349,9 @@ function barra(titulo, voltar, acao, big) {
 }
 function vNav() {
   const disp = S.loaded ? faltas().filter(f => f.status === 'disponivel').length : 0;
-  const t = [['inicio', 'Início', I.home, disp], ['clientes', 'Clientes', I.store, 0], ['faltas', 'Faltas', I.box, 0], ['chegadas', 'Chegadas', I.truck, 0], ['mais', 'Mais', I.grid, 0]];
-  return `<nav class="tabs" aria-label="Navegação principal">${t.map(([k, l, ic, b]) => `<button data-act="tab" data-t="${k}" ${S.tab === k ? 'aria-current="page"' : ''}><span class="pill">${svg(ic, 22)}</span>${l}${b ? `<span class="badge">${b}</span>` : ''}</button>`).join('')}</nav>`;
+  const t = [['inicio', 'Início', I.home, disp], ['clientes', 'Clientes', I.store, 0], ['faltas', 'Faltas', I.box, 0], ['roteiro', 'Roteiro', I.route, 0], ['mais', 'Mais', I.grid, 0]];
+  const ativo = S.tab === 'chegadas' ? 'mais' : S.tab;
+  return `<nav class="tabs" aria-label="Navegação principal">${t.map(([k, l, ic, b]) => `<button data-act="tab" data-t="${k}" ${ativo === k ? 'aria-current="page"' : ''}><span class="pill">${svg(ic, 22)}</span>${l}${b ? `<span class="badge">${b}</span>` : ''}</button>`).join('')}</nav>`;
 }
 function vFab() {
   if (!S.loaded) return '';
@@ -397,8 +398,8 @@ function vInicio() {
   let h = `<header class="appbar big"><div style="flex:1"><p class="sub" style="margin:0 0 4px">${esc(hoje.charAt(0).toUpperCase() + hoje.slice(1))}</p><h1>${saud()}!</h1></div></header><div class="stack">`;
   if (!clientes().length) {
     h += `<section class="card stack"><span class="eyebrow">Comece por aqui</span>
-      <p class="sub" style="margin:0">1. Cadastre seus clientes e os dias de visita.<br>2. Quando faltar um produto, registre a falta com o <b>código Ramada</b>.<br>3. Quando chegar o print no grupo da Ramada, envie em <b>Chegadas</b>: o app encontra quem estava esperando e aprende os produtos.</p>
-      <button class="btn pri" data-act="novoCli">${svg(I.plus, 20)}Cadastrar primeiro cliente</button>${botaoImport('clientes', 'Importar de planilha ou contatos')}</section>`;
+      <p class="sub" style="margin:0">1. Antes da visita, cadastre o cliente (só nome e telefone).<br>2. Na visita, com o Mercos aberto ao lado, registre cada falta pelo <b>código</b>.<br>3. Uma ou duas vezes por semana, use <b>Faltas › Conferir no Mercos</b> e marque o que chegou.<br>4. O app mostra aqui quem avisar, com a mensagem pronta no WhatsApp.</p>
+      <button class="btn pri" data-act="novoCli">${svg(I.plus, 20)}Cadastrar primeiro cliente</button></section>`;
   }
   const uc = ultimaCopia();
   if (all().length > 2 && (!uc || (Date.now() - new Date(uc)) > 3 * 864e5)) {
@@ -406,22 +407,19 @@ function vInicio() {
   }
   if (srv.online && srv.recebidos && !(S.imp.pendentes || []).length) h += `<button class="card linkbtn row" data-act="verRecebidos" style="justify-content:space-between;flex-wrap:nowrap;background:var(--oll);border-color:var(--olt)"><span><span class="t" style="display:block">${srv.recebidos} ${pl(srv.recebidos, 'print recebido', 'prints recebidos')} pelo Termux</span><span class="m" style="display:block">Toque para ler em Chegadas</span></span>${svg(I.chev, 20)}</button>`;
   if ((S.imp.pendentes || []).length) h += `<button class="card linkbtn row" data-act="tab" data-t="chegadas" style="justify-content:space-between;flex-wrap:nowrap;background:var(--oll);border-color:var(--olt)"><span><span class="t" style="display:block">${S.imp.pendentes.length} ${pl(S.imp.pendentes.length, 'print esperando', 'prints esperando')} leitura</span><span class="m" style="display:block">Toque para ler em Chegadas</span></span>${svg(I.chev, 20)}</button>`;
-  // roteiro
-  const rot = roteiro(); const rl = rot ? (rot.clientes || []).filter(id => cli(id)) : [];
+  // roteiro de hoje
+  const rot = roteiro(); const rl = rotClientes(hojeISO());
   if (clientes().length) {
-    const feitos = rl.filter(id => rot.visitados && rot.visitados[id]).length;
-    h += `<section class="card stack" style="gap:0"><div class="item" style="align-items:center;margin-bottom:6px"><div><span class="eyebrow">Roteiro de hoje</span>${rl.length ? `<div class="m">${feitos} de ${rl.length} ${pl(rl.length, 'visita feita', 'visitas feitas')}</div>` : ''}</div><button class="btn sm tint" data-act="montarRoteiro">${svg(rl.length ? I.edit : I.route, 18)}${rl.length ? 'Editar' : 'Montar'}</button></div>`;
-    if (!rl.length) h += `<p class="hint" style="margin:6px 0 0">Monte o roteiro com os clientes que vai visitar hoje. O app sugere os do dia e os atrasados.</p>`;
-    const pend = rl.filter(id => !(rot.visitados && rot.visitados[id])).map(cli);
-    const rota = mapsRota(pend);
-    const am = roteiro(dataISO(1)); const amN = am ? (am.clientes || []).filter(id => cli(id)).length : 0;
-    var rodapeRot = (rota ? `<a class="btn sm tint" style="margin-top:10px" href="${esc(rota)}" target="_blank" rel="noopener">${svg(I.route, 18)}Abrir rota no Maps${pend.filter(c => c.endereco).length > 4 ? ' (próximas 4)' : ''}</a>` : (rl.length && pend.length && !pend.some(c => c.endereco) ? `<p class="hint" style="margin:10px 0 0">Cadastre o endereço dos clientes para abrir a rota no Maps.</p>` : '')) + (amN ? `<p class="hint" style="margin:10px 0 0">Amanhã: ${amN} ${pl(amN, 'cliente', 'clientes')} no roteiro.</p>` : '');
-    rl.forEach((id, i) => {
-      const c = cli(id); const ok = rot.visitados && rot.visitados[id]; const nd = fs.filter(f => f.clienteId === id && f.status === 'disponivel').length;
-      h += `<div class="line"><span class="num ${ok ? 'ok' : ''}">${ok ? svg(I.check, 16) : i + 1}</span><button class="linkbtn" style="flex:1;min-width:0" data-act="openCli" data-id="${esc(id)}"><span class="t" style="display:block">${esc(c.nome)}</span><span class="m" style="display:block">${esc(c.cidade || '')}${ok ? (c.cidade ? ' · ' : '') + 'visitado ' + hm(ok) : ''}</span>${nd ? `<span class="chip" style="color:#166534;background:#DCFCE7;margin-top:4px">${nd} para oferecer</span>` : ''}</button>${ok ? '' : `<button class="btn sm pri" data-act="visitei" data-id="${esc(id)}">Visitei</button>`}</div>`;
-    });
-    h += rodapeRot + `</section>`;
+    const amN = rotClientes(dataISO(1)).length;
+    h += `<section class="card stack" style="gap:0"><div class="item" style="align-items:center;margin-bottom:4px"><span class="eyebrow">Roteiro de hoje${rl.length ? ' · ' + rl.length : ''}</span><button class="btn sm tint" data-act="irRoteiro">${svg(rl.length ? I.edit : I.route, 18)}${rl.length ? 'Abrir' : 'Montar'}</button></div>`;
+    if (!rl.length) h += `<p class="hint" style="margin:6px 0 0">${amN ? 'Nada para hoje.' : 'Monte na noite anterior os clientes que vai atender.'}</p>`;
+    h += rl.map((id, i) => rotLinha(id, i, hojeISO(), rot, false)).join('');
+    if (amN) h += `<p class="hint" style="margin:10px 0 0">Amanhã: ${amN} ${pl(amN, 'cliente', 'clientes')} no roteiro.</p>`;
+    h += `</section>`;
   }
+  // conferir no Mercos
+  const gsc = gruposConferir();
+  if (gsc.length) { const pend = gsc.filter(g => !g.hoje).length; h += `<button class="card linkbtn row" data-act="irConferir" style="justify-content:space-between;flex-wrap:nowrap"><span><span class="t" style="display:block">Conferir faltas no Mercos</span><span class="m" style="display:block">${gsc.length} ${pl(gsc.length, 'item', 'itens')} em aberto${pend < gsc.length ? ' · ' + pend + ' sem conferir hoje' : ''}</span></span>${svg(I.chev, 20)}</button>`; }
   if (disp.length) {
     const g = groupBy(disp, 'clienteId');
     h += `<section class="hero stack" style="gap:8px"><span class="eyebrow">Disponível para venda</span><h2 style="font-size:19px;color:#fff;line-height:1.3">${disp.length} ${pl(disp.length, 'falta liberada', 'faltas liberadas')} para oferecer</h2><p style="margin:0;color:#DDE5C8;font-size:14px">${g.size} ${pl(g.size, 'cliente esperando', 'clientes esperando')}. Ofereça hoje.</p></section>`;
@@ -449,11 +447,11 @@ function vInicio() {
   // resumo do mês
   if (fs.length || clientes().length) {
     const vm = clientes().reduce((s, c) => s + (Array.isArray(c.visitas) ? c.visitas.filter(v => sameMonth(v.em)).length : 0), 0);
-    const an = fs.filter(f => sameMonth(f.criadoEm)).length;
+    const pdm = clientes().reduce((s, c) => s + pedidosDe(c).filter(p => sameMonth(p.em)).length, 0);
     const rec = fs.filter(f => f.status === 'vendido' && sameMonth(f.atualizadoEm)).length;
     h += `<span class="eyebrow" style="margin-top:4px">Resumo do mês</span><section class="grid3">
-      <button class="stat" data-act="tab" data-t="clientes"><b>${vm}</b><span>Visitas feitas</span></button>
-      <button class="stat" data-act="filtro" data-f="todas"><b>${an}</b><span>Faltas anotadas</span></button>
+      <button class="stat" data-act="irRoteiro"><b>${vm}</b><span>Visitas feitas</span></button>
+      <button class="stat" data-act="irRoteiro"><b>${pdm}</b><span>Pedidos</span></button>
       <button class="stat" data-act="filtro" data-f="vendido"><b>${rec}</b><span>Viraram venda</span></button></section>`;
   }
   return h + '</div>';
@@ -466,8 +464,11 @@ function vFaltas() {
   const qq = norm(S.busca);
   if (qq) list = list.filter(f => norm([f.produto, f.codigo, f.marca, (cli(f.clienteId) || {}).nome].join(' ')).includes(qq));
   list.sort((a, b) => (ORDEM.indexOf(a.status) - ORDEM.indexOf(b.status)) || (b.atualizadoEm || '').localeCompare(a.atualizadoEm || ''));
+  const ngc = gruposConferir().length;
+  const seg = `<div class="seg" role="group" aria-label="Modo da tela de faltas"><button data-act="faltaModo" data-m="lista" aria-pressed="${S.faltaModo !== 'conferir'}">Por cliente</button><button data-act="faltaModo" data-m="conferir" aria-pressed="${S.faltaModo === 'conferir'}">Conferir no Mercos${ngc ? ' · ' + ngc : ''}</button></div>`;
+  if (S.faltaModo === 'conferir') return `${barra('Faltas')}<div class="stack">${seg}${vConferir()}</div>`;
   return `${barra('Faltas')}
-  <div class="stack">
+  <div class="stack">${seg}
     <label class="search">${svg(I.search, 20)}<span class="sr">Buscar faltas</span><input id="buscaF" data-in="busca" type="search" placeholder="Produto, código, marca ou cliente" value="${esc(S.busca)}"></label>
     <div class="chips" role="group" aria-label="Filtrar por situação">${filtros.map(([k, l]) => `<button class="fchip" data-act="filtro" data-f="${k}" aria-pressed="${S.filtro === k}">${l}${k !== 'todas' ? ' · ' + cnt(k) : ''}</button>`).join('')}</div>
     <div class="list">${list.length ? list.map(f => faltaCard(f)).join('') : `<div class="empty">${fs.length ? 'Nada nesta situação.' : 'Nenhuma falta registrada ainda.<br>Toque em “Registrar falta” quando um cliente pedir algo que não tem.'}</div>`}</div>
@@ -482,7 +483,6 @@ function vClientes() {
   return `${barra('Clientes')}
   <div class="stack">
     <label class="search">${svg(I.search, 20)}<span class="sr">Buscar cliente</span><input id="buscaC" data-in="buscaCli" type="search" placeholder="Nome, cidade ou comprador" value="${esc(S.buscaCli)}"></label>
-    ${botaoImport('clientes', 'Importar clientes (Excel, CSV ou contatos)', 'tint sm')}
     <div class="list">${list.length ? list.map(c => {
       const mine = fs.filter(f => f.clienteId === c.id);
       const d = mine.filter(f => f.status === 'disponivel').length, ab = mine.filter(f => ['aguardando', 'armazenando'].includes(f.status)).length;
@@ -492,7 +492,7 @@ function vClientes() {
         <span class="t" style="display:block">${esc(c.nome)}</span>
         <span class="m" style="display:block">${esc([c.cidade, dias].filter(Boolean).join(' · ') || 'Sem detalhes')}</span>
         <span class="m" style="display:block;color:${atr ? 'var(--rd)' : 'var(--mu)'}">${dv === null ? 'Sem visita registrada' : dv === 0 ? 'Visitado hoje' : 'Última visita há ' + dv + ' ' + pl(dv, 'dia', 'dias')}</span>
-        <span class="row" style="margin-top:6px">${d ? `<span class="chip" style="color:#166534;background:#DCFCE7">${d} ${pl(d, 'disponível', 'disponíveis')}</span>` : ''}${ab ? `<span class="chip" style="color:#374151;background:#E5E7EB">${ab} em aberto</span>` : ''}</span></span>${svg(I.chev, 20)}</button>`;
+        <span class="row" style="margin-top:6px">${pedidoNoDia(c, hojeISO()) ? `<span class="chip" style="color:#166534;background:#DCFCE7">✓ Pedido hoje</span>` : ''}${d ? `<span class="chip" style="color:#166534;background:#DCFCE7">${d} ${pl(d, 'disponível', 'disponíveis')}</span>` : ''}${ab ? `<span class="chip" style="color:#374151;background:#E5E7EB">${ab} em aberto</span>` : ''}</span></span>${svg(I.chev, 20)}</button>`;
     }).join('') : `<div class="empty">${clientes().length ? 'Nenhum cliente encontrado.' : 'Nenhum cliente cadastrado ainda.'}</div>`}</div>
   </div>`;
 }
@@ -510,7 +510,7 @@ function vCliente() {
       <p class="sub">${dv === null ? 'Nenhuma visita registrada' : 'Última visita: ' + dm(c.ultimaVisita) + (dv === 0 ? ' (hoje)' : ' (há ' + dv + ' ' + pl(dv, 'dia', 'dias') + ')')}${(c.diasVisita || []).length ? ' · visita: ' + c.diasVisita.map(i => DIAS[i]).join(', ') : ''}</p>
       ${c.endereco ? `<p class="sub">${esc(c.endereco)}</p>` : ''}${c.telefone ? `<p class="sub">${esc(c.telefone)}</p>` : ''}</div>
     <div class="grid3">${tel ? `<a class="btn sm" href="${esc(waLink(c))}" target="_blank" rel="noopener">${svg(I.wa, 18)}WhatsApp</a><a class="btn sm" href="tel:${esc(tel)}">${svg(I.phone, 18)}Ligar</a>` : `<button class="btn sm" data-act="editCli" data-id="${esc(c.id)}" style="grid-column:span 2">Adicionar telefone</button>`}<button class="btn sm pri" data-act="registrarVisita" data-id="${esc(c.id)}">${svg(I.check, 18)}Visitei</button></div>
-    <div class="grid2"><button class="btn sm tint" data-act="novaFalta" data-id="${esc(c.id)}">${svg(I.plus, 18)}Registrar falta</button>${PEDIDOS ? `<button class="btn sm tint" data-act="novoPedido" data-id="${esc(c.id)}">${svg(I.cart, 18)}Pedido</button>` : (endCompleto(c) && c.endereco ? `<a class="btn sm tint" href="${esc(mapsBusca(c))}" target="_blank" rel="noopener">${svg(I.route, 18)}Ver no Maps</a>` : `<button class="btn sm tint" data-act="editCli" data-id="${esc(c.id)}">${svg(I.route, 18)}Pôr endereço</button>`)}</div>
+    <div class="grid2"><button class="btn sm tint" data-act="novaFalta" data-id="${esc(c.id)}">${svg(I.plus, 18)}Registrar falta</button>${(() => { const ped = pedidoNoDia(c, hojeISO()); return `<button class="btn sm ${ped ? '' : 'tint'}" data-act="pedido" data-id="${esc(c.id)}" data-d="${hojeISO()}" aria-pressed="${ped}" style="${ped ? 'background:#DCFCE7;border-color:#86EFAC;color:#166534' : ''}">${svg(ped ? I.check : I.cart, 18)}${ped ? 'Fez pedido hoje' : 'Fez pedido'}</button>`; })()}</div>
   </section>`;
   if (disp.length) h += `<section class="hero stack" style="margin-top:12px;gap:10px"><span class="eyebrow">Ofereça nesta visita</span><h2 style="color:#fff">${disp.length} ${pl(disp.length, 'produto liberado', 'produtos liberados')}</h2><div class="grid2"><a class="btn wa sm" href="${esc(waLink(c, disp, 'disp'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a><button class="btn sm" data-act="ofertarCli" data-id="${esc(c.id)}">Ofereci tudo</button></div></section>`;
   const tabs = [['faltas', `Faltas (${mine.filter(f => !['vendido', 'cancelado'].includes(f.status)).length})`], ['pedidos', `Pedidos (${peds.length})`], ['visitas', 'Visitas e notas']].filter(([k]) => PEDIDOS || k !== 'pedidos');
@@ -532,6 +532,8 @@ function vCliente() {
       ${notas.map((n, i) => ({ n, i })).reverse().map(({ n, i }) => `<div class="note"><div><small>${dm(n.em)}</small><div style="font-size:14px;line-height:1.45;margin-top:4px;white-space:pre-wrap">${esc(n.txt)}</div></div><button class="ibtn" data-act="delNota" data-i="${i}" aria-label="Apagar anotação">${svg(I.x, 18)}</button></div>`).join('')}
       <label class="f"><span class="sr">Nova anotação</span><textarea id="notaTxt" data-in="nota" class="inp" placeholder="Ex.: comprador prefere visita na terça; pagamento 28/35 dias">${esc(S.nota)}</textarea></label>
       <button class="btn" data-act="addNota">Salvar anotação</button>
+      <span class="eyebrow" style="margin-top:8px">Pedidos registrados</span>
+      ${pedidosDe(c).length ? `<div class="card" style="padding:4px 14px">${pedidosDe(c).slice().reverse().slice(0, 30).map(p => `<div class="line"><span>${new Date(p.em).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })}</span><span class="chip" style="color:#166534;background:#DCFCE7">Pedido</span></div>`).join('')}</div>` : `<div class="empty">Nenhum pedido registrado.</div>`}
       <span class="eyebrow" style="margin-top:8px">Visitas</span>
       ${vis.length ? `<div class="card" style="padding:4px 14px">${vis.slice(0, 30).map(v => `<div class="line"><span>${new Date(v.em).toLocaleDateString('pt-BR')} ${hm(v.em)}</span><span class="hint" style="text-align:right">${esc(v.obs || '')}</span></div>`).join('')}</div>` : `<div class="empty">Nenhuma visita registrada.</div>`}
       <button class="btn danger" data-act="delCli" data-id="${esc(c.id)}" style="margin-top:16px">Excluir cliente</button>`;
@@ -541,7 +543,7 @@ function vCliente() {
 
 function vChegadas() {
   const im = S.imp;
-  let h = `${barra('Chegadas')}<p class="sub" style="margin:-4px 0 14px">Mande o print do grupo da Ramada. O app lê os códigos, encontra quem estava esperando e guarda os produtos no catálogo.</p><div class="stack">
+  let h = `${barra('Chegadas', 'irMais')}<p class="sub" style="margin:-4px 0 14px">(Opcional) Mande o print do grupo da Ramada. O app lê os códigos, encontra quem estava esperando e guarda os produtos no catálogo.</p><div class="stack">
   <section class="card stack">
     <span class="eyebrow">1. O que diz o print?</span>
     <div class="seg" role="group" aria-label="Situação dos produtos do print">
@@ -592,9 +594,17 @@ function vMais() {
     ${row('mensagens', I.msg, 'Mensagens do WhatsApp', 'Textos dos avisos aos clientes')}
     ${row('config', I.gear, 'Visitas', `Frequência padrão: a cada ${Number(cfg().freq) || 14} dias`)}
   </section>
+  <span class="eyebrow">Opcional</span>
+  <section class="card menu" style="padding:4px 16px">
+    <button class="linkbtn" data-act="tab" data-t="chegadas"><span class="mic">${svg(I.truck, 22)}</span><span style="flex:1;min-width:0"><span class="t" style="display:block">Ler print de chegada</span><span class="m" style="display:block">Prints do grupo da Ramada (WhatsApp › compartilhar › Termux)</span></span>${svg(I.chev, 20)}</button>
+  </section>
+  ${botaoImport('clientes', 'Importar clientes de planilha ou contatos', 'tint sm')}
   <section class="card stack" style="gap:6px"><span class="t">Representante · versão ${VERSAO}</span>
     <p class="hint" style="margin:0">${clientes().length} clientes · ${faltas().length} faltas · ${produtos().length} produtos no catálogo · Termux: ${srv.online ? 'ligado' : 'desligado'}</p>
-    <details><summary>Novidades das versões 1.4 a 1.8</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+    <details><summary>Novidades das versões 1.4 a 1.9</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+      <li>1.9: app mais simples: registrar falta › conferir no Mercos › avisar</li>
+      <li>1.9: aba Roteiro (planeje a noite anterior) e botão Pedido que fica verde</li>
+      <li>1.9: cadastro rápido do cliente; prints e importação viraram opcionais em Mais</li>
       <li>1.8: várias faltas de uma vez na visita (Enter pula de campo)</li>
       <li>1.8: importar clientes (Excel, CSV ou contatos .vcf) e catálogo (Excel, CSV ou PDF)</li>
       <li>1.7: print do WhatsApp agora é compartilhado com o Termux (o Chrome travava)</li>
@@ -696,7 +706,7 @@ function renderModal() {
       <label class="f">Cliente<select name="clienteId" class="inp"><option value="">Escolha…</option>${clientes().map(c => `<option value="${esc(c.id)}" ${c.id === cid ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</select></label>
       ${cid ? '' : `<label class="f">Ou cliente novo<input name="novoCliente" class="inp" placeholder="Nome da loja (se não estiver na lista)"></label>`}
       <label class="f">Código Ramada<input name="codigo" class="inp" inputmode="numeric" placeholder="Ex.: 31331" value="${esc(f.codigo || '')}" autocomplete="off"><span class="hint" id="codHint">${produtos().length ? 'Digite o código: o produto vem do catálogo.' : 'É pelo código que o app reconhece a chegada no print.'}</span></label>
-      <label class="f">Produto<input name="produto" class="inp" placeholder="Nome ou parte do nome" value="${esc(f.produto || '')}" autocomplete="off"></label>
+      <label class="f">Produto (opcional)<input name="produto" class="inp" placeholder="Nome ou parte do nome" value="${esc(f.produto || '')}" autocomplete="off"></label>
       <div id="sugProd"></div>
       <div class="grid2"><label class="f">Marca<input name="marca" class="inp" list="dlMarcas" placeholder="Ex.: Tigre" value="${esc(f.marca || '')}"></label>
       <label class="f">Quantidade<input name="qtd" class="inp" type="number" min="0" inputmode="numeric" value="${esc(f.qtd ?? '')}"></label></div>
@@ -709,12 +719,12 @@ function renderModal() {
     const dv = c.diasVisita || [];
     inner = `<form class="sheet stack" data-form="cliente" style="gap:14px">${head(m.id ? 'Editar cliente' : 'Novo cliente')}
       <label class="f">Nome da loja<input name="nome" class="inp" required value="${esc(c.nome || '')}"></label>
-      <label class="f">Endereço<input name="endereco" class="inp" placeholder="Rua, número, bairro" value="${esc(c.endereco || '')}" autocomplete="street-address"><span class="hint">Usado para abrir a rota do dia no Maps.</span></label>
+      <label class="f">Telefone / WhatsApp<input name="telefone" class="inp" type="tel" inputmode="tel" placeholder="(00) 00000-0000" value="${esc(c.telefone || '')}"></label>
+      <details ${m.id && (c.cidade || c.comprador || dv.length) ? 'open' : ''}><summary>Mais detalhes (opcional)</summary><div class="stack" style="gap:14px;padding-top:6px">
       <label class="f">Cidade<input name="cidade" class="inp" value="${esc(c.cidade || '')}"></label>
       <label class="f">Comprador<input name="comprador" class="inp" value="${esc(c.comprador || '')}"></label>
-      <label class="f">Telefone / WhatsApp<input name="telefone" class="inp" type="tel" inputmode="tel" placeholder="(00) 00000-0000" value="${esc(c.telefone || '')}"></label>
       <fieldset style="border:0;margin:0;padding:0" class="stack"><legend class="f" style="font-size:14px;font-weight:600;margin-bottom:6px">Dias de visita</legend><div class="days">${DIAS.map((d, i) => `<label><input type="checkbox" name="dia" value="${i}" ${dv.includes(i) ? 'checked' : ''}><span>${d}</span></label>`).join('')}</div></fieldset>
-      <label class="f">Visitar a cada<select name="freq" class="inp"><option value="">Padrão (${Number(cfg().freq) || 14} dias)</option>${[7, 14, 21, 30, 45, 60].map(n => `<option value="${n}" ${Number(c.freq) === n ? 'selected' : ''}>${n} dias</option>`).join('')}</select></label>
+      <label class="f">Visitar a cada<select name="freq" class="inp"><option value="">Padrão (${Number(cfg().freq) || 14} dias)</option>${[7, 14, 21, 30, 45, 60].map(n => `<option value="${n}" ${Number(c.freq) === n ? 'selected' : ''}>${n} dias</option>`).join('')}</select></label></div></details>
       <button class="btn pri block" type="submit">Salvar cliente</button></form>`;
   } else if (m.type === 'faltaMenu') {
     const f = items.get(m.id); if (!f) { S.modal = null; el.innerHTML = ''; return; }
@@ -1161,6 +1171,88 @@ async function marcarVisita(cid, obs) {
   aposMudar(); vibrar();
 }
 
+/* ---------- roteiro (aba) ---------- */
+const isoLocal = iso => { const d = new Date(iso); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const diasProximos = () => Array.from({ length: 7 }, (_, i) => dataISO(i));
+const rotuloDia = d => { const i = diasProximos().indexOf(d); if (i === 0) return 'Hoje'; if (i === 1) return 'Amanhã'; return DIAS[new Date(d + 'T12:00:00').getDay()] + ' ' + d.slice(8, 10) + '/' + d.slice(5, 7); };
+const pedidosDe = c => Array.isArray(c.pedidosDia) ? c.pedidosDia : [];
+const pedidoNoDia = (c, d) => pedidosDe(c).some(p => isoLocal(p.em) === d);
+const rotClientes = d => { const r = roteiro(d); return r ? (r.clientes || []).filter(id => cli(id)) : []; };
+function rotLinha(id, i, d, r, editar) {
+  const c = cli(id); const vis = r && r.visitados && r.visitados[id]; const ped = pedidoNoDia(c, d); const ehHoje = d === hojeISO();
+  const nd = faltas().filter(f => f.clienteId === id && f.status === 'disponivel').length;
+  const acoes = editar
+    ? `<button class="ibtn" data-act="rotUp" data-i="${i}" aria-label="Subir ${esc(c.nome)}" ${i === 0 ? 'disabled' : ''}>${svg(I.up, 20)}</button><button class="ibtn" data-act="rotDown" data-i="${i}" aria-label="Descer ${esc(c.nome)}">${svg(I.down, 20)}</button><button class="ibtn" data-act="rotTirar" data-id="${esc(id)}" aria-label="Tirar ${esc(c.nome)} do roteiro">${svg(I.x, 20)}</button>`
+    : `${ehHoje && !vis ? `<button class="btn sm pri" data-act="visitei" data-id="${esc(id)}">Visitei</button>` : ''}<button class="btn sm" data-act="pedido" data-id="${esc(id)}" data-d="${d}" aria-pressed="${ped}" style="${ped ? 'background:#DCFCE7;border-color:#86EFAC;color:#166534' : ''}">${ped ? svg(I.check, 16) : ''}Pedido</button>`;
+  return `<div class="line"><span class="num ${vis ? 'ok' : ''}">${vis ? svg(I.check, 16) : i + 1}</span>
+    <button class="linkbtn" style="flex:1;min-width:0" data-act="openCli" data-id="${esc(id)}"><span class="t" style="display:block">${esc(c.nome)}</span><span class="m" style="display:block">${esc([c.cidade, vis ? 'visitado ' + hm(vis) : '', ped ? 'fez pedido' : ''].filter(Boolean).join(' · '))}</span>${nd ? `<span class="chip" style="color:#166534;background:#DCFCE7;margin-top:4px">${nd} para oferecer</span>` : ''}</button>
+    <span class="row" style="gap:6px;flex-wrap:nowrap">${acoes}</span></div>`;
+}
+function vRoteiro() {
+  const d = S.rotData && diasProximos().includes(S.rotData) ? S.rotData : hojeISO();
+  const r = roteiro(d); const sel = rotClientes(d); const wd = new Date(d + 'T12:00:00').getDay();
+  const feitos = sel.filter(id => r.visitados && r.visitados[id]).length, peds = sel.filter(id => pedidoNoDia(cli(id), d)).length;
+  let h = `${barra('Roteiro')}<div class="chips" role="group" aria-label="Dia do roteiro">${diasProximos().map(x => { const n = rotClientes(x).length; return `<button class="fchip" data-act="rotData" data-d="${x}" aria-pressed="${x === d}">${rotuloDia(x)}${n ? ' · ' + n : ''}</button>`; }).join('')}</div><div class="stack" style="margin-top:12px">`;
+  if (!clientes().length) return h + `<div class="empty">Cadastre seus clientes para montar o roteiro.</div><button class="btn pri" data-act="novoCli">${svg(I.plus, 20)}Novo cliente</button></div>`;
+  h += `<section class="card stack" style="gap:0"><div class="item" style="align-items:center;margin-bottom:4px"><div><span class="eyebrow">${d === hojeISO() ? 'Hoje' : rotuloDia(d)} · ${sel.length} ${pl(sel.length, 'cliente', 'clientes')}</span>${sel.length ? `<div class="m">${d === hojeISO() ? feitos + ' ' + pl(feitos, 'visitado', 'visitados') + ' · ' : ''}${peds} ${pl(peds, 'pedido', 'pedidos')}</div>` : ''}</div>${sel.length ? `<button class="btn sm tint" data-act="rotEditar">${S.rotEditar ? 'Pronto' : 'Organizar'}</button>` : ''}</div>`;
+  h += sel.length ? sel.map((id, i) => rotLinha(id, i, d, r, S.rotEditar)).join('') : `<p class="hint" style="margin:6px 0 4px">Nenhum cliente neste dia. Toque nos clientes abaixo para incluir.</p>`;
+  h += `</section>`;
+  let outros = clientes().filter(c => !sel.includes(c.id));
+  const qq = norm(S.buscaRot); if (qq) outros = outros.filter(c => norm([c.nome, c.cidade].join(' ')).includes(qq));
+  outros = outros.map(c => ({ c, dia: (c.diasVisita || []).includes(wd), at: atraso(c) })).sort((a, b) => (b.dia - a.dia) || (b.at >= 0) - (a.at >= 0) || norm(a.c.nome).localeCompare(norm(b.c.nome)));
+  h += `<span class="eyebrow" style="margin-top:6px">Adicionar ao roteiro de ${d === hojeISO() ? 'hoje' : rotuloDia(d).toLowerCase()}</span>
+    <label class="search">${svg(I.search, 20)}<span class="sr">Buscar cliente</span><input id="buscaRot" data-in="buscaRot" type="search" placeholder="Buscar cliente" value="${esc(S.buscaRot)}"></label>
+    <div class="card" style="padding:4px 14px">${outros.length ? outros.slice(0, 60).map(({ c, dia, at }) => `<button class="linkbtn line" data-act="rotIncluir" data-id="${esc(c.id)}" data-d="${d}"><span style="min-width:0"><span class="t" style="display:block">${esc(c.nome)}</span><span class="m" style="display:block">${esc([c.cidade, dia ? 'dia de visita' : '', at >= 0 ? (c.ultimaVisita ? 'sem visita há ' + diasDesde(c.ultimaVisita) + ' dias' : 'sem visita registrada') : ''].filter(Boolean).join(' · '))}</span></span><span class="mic" style="width:36px;height:36px">${svg(I.plus, 20)}</span></button>`).join('') : `<p class="hint">${qq ? 'Nenhum cliente encontrado.' : 'Todos os clientes já estão neste dia.'}</p>`}</div>`;
+  return h + '</div>';
+}
+async function togglePedido(cid, d) {
+  const c = cli(cid); if (!c) return false;
+  const l = pedidosDe(c); const ja = l.some(p => isoLocal(p.em) === d);
+  const nova = ja ? l.filter(p => isoLocal(p.em) !== d) : [...l, { em: d === hojeISO() ? now() : new Date(d + 'T12:00:00').toISOString() }].slice(-300);
+  await save(cid, { ...c, pedidosDia: nova }); vibrar();
+  return !ja;
+}
+
+/* ---------- conferir no Mercos ---------- */
+function gruposConferir() {
+  const m = new Map();
+  for (const f of faltas().filter(f => f.status === 'aguardando' || f.status === 'armazenando')) {
+    const k = normCode(f.codigo) ? 'c' + normCode(f.codigo) : 'n' + norm(f.produto);
+    if (!m.has(k)) m.set(k, { k, codigo: f.codigo, produto: '', lista: [], qtd: 0, conf: null });
+    const g = m.get(k); g.lista.push(f); g.qtd += Number(f.qtd) || 0;
+    if (!g.produto && f.produto) g.produto = f.produto;
+    if (f.conferidoEm && (!g.conf || f.conferidoEm > g.conf)) g.conf = f.conferidoEm;
+  }
+  const hoje = hojeISO();
+  return [...m.values()].map(g => ({ ...g, hoje: g.conf && isoLocal(g.conf) === hoje })).sort((a, b) => (a.hoje - b.hoje) || (b.lista.length - a.lista.length));
+}
+function vConferir() {
+  const gs = gruposConferir(); const pend = gs.filter(g => !g.hoje).length;
+  const ult = gs.map(g => g.conf).filter(Boolean).sort().pop();
+  let h = `<p class="sub" style="margin:0">Abra o Mercos ao lado. Para cada código, confira o estoque e toque em <b>Chegou</b> ou <b>Ainda não</b>. “Chegou” vale para todos os clientes que pediram aquele item.</p>
+    <p class="hint" style="margin:0">${gs.length} ${pl(gs.length, 'item', 'itens')} para conferir${pend !== gs.length ? ' · ' + pend + ' ainda não conferidos hoje' : ''}${ult ? ' · última conferência ' + dm(ult) : ''}</p>`;
+  if (!gs.length) return h + `<div class="empty">Nenhuma falta em aberto. Tudo conferido!</div>`;
+  h += gs.map(g => {
+    const nomes = [...new Set(g.lista.map(f => (cli(f.clienteId) || {}).nome).filter(Boolean))];
+    return `<article class="card" style="padding:14px;${g.hoje ? 'opacity:.6' : ''}"><div class="item"><div style="min-width:0">
+      <div class="money" style="font-size:20px">${g.codigo ? esc(g.codigo) : 'Sem código'}</div>
+      ${g.produto ? `<div class="t" style="font-weight:500">${esc(g.produto)}</div>` : ''}
+      <div class="m">${g.lista.length} ${pl(g.lista.length, 'cliente', 'clientes')}${g.qtd ? ' · ' + g.qtd + ' un no total' : ''}: ${esc(nomes.join(', '))}</div></div>
+      ${g.hoje ? '<span class="chip" style="color:#374151;background:#E5E7EB">Conferido hoje</span>' : ''}</div>
+      <div class="row" style="margin-top:10px">${g.codigo ? `<button class="btn sm ghost" data-act="copiar" data-v="${esc(g.codigo)}">Copiar</button>` : ''}<button class="btn sm" data-act="naoChegou" data-k="${esc(g.k)}">Ainda não</button><button class="btn sm pri" data-act="chegouGrupo" data-k="${esc(g.k)}">${svg(I.check, 16)}Chegou</button></div></article>`;
+  }).join('');
+  return h;
+}
+async function marcarGrupo(k, chegou) {
+  const g = gruposConferir().find(x => x.k === k); if (!g) return 0;
+  const em = now();
+  const lista = g.lista.map(f => chegou
+    ? { ...f, status: 'disponivel', atualizadoEm: em, conferidoEm: em, hist: [...(Array.isArray(f.hist) ? f.hist.slice(-30) : []), { s: 'disponivel', em, via: 'mercos' }] }
+    : { ...f, conferidoEm: em });
+  await saveMany(lista); vibrar();
+  return lista.length;
+}
+
 /* ---------- backup ---------- */
 async function lerRestore(file) {
   try { const j = JSON.parse(await file.text()); if (!j || !Array.isArray(j.itens)) throw 0; openModal({ type: 'restore', data: j }); }
@@ -1185,7 +1277,7 @@ document.addEventListener('click', async e => {
   const act = el.dataset.act, id = el.dataset.id;
   try {
     switch (act) {
-      case 'tab': S.tab = el.dataset.t; S.cli = null; S.sub = null; window.scrollTo(0, 0); render(); break;
+      case 'tab': S.tab = el.dataset.t; S.cli = null; S.sub = null; if (S.tab === 'roteiro' && !S.rotData) S.rotData = hojeISO(); window.scrollTo(0, 0); render(); break;
       case 'sub': S.sub = el.dataset.s; window.scrollTo(0, 0); render(); break;
       case 'subVoltar': S.sub = null; window.scrollTo(0, 0); render(); break;
       case 'irBackup': S.tab = 'mais'; S.sub = 'backup'; window.scrollTo(0, 0); render(); break;
@@ -1221,10 +1313,19 @@ document.addEventListener('click', async e => {
       case 'addNota': { const t = S.nota.trim(); if (!t) { toast('Escreva a anotação primeiro'); break; } const c = cli(S.cli); const notas = [...(Array.isArray(c.notas) ? c.notas : []), { em: now(), txt: t }].slice(-200); S.nota = ''; await patch(c.id, { notas }); toast('Anotação salva'); break; }
       case 'delNota': { const c = cli(S.cli); const notas = (c.notas || []).filter((_, i) => i !== Number(el.dataset.i)); await patch(c.id, { notas }); break; }
       // roteiro / visitas
-      case 'montarRoteiro': { const r = roteiro(); openModal({ type: 'roteiro', sel: r ? (r.clientes || []).filter(x => cli(x)) : [] }); break; }
+      case 'montarRoteiro': case 'irRoteiro': S.tab = 'roteiro'; S.rotData = hojeISO(); S.cli = null; S.sub = null; window.scrollTo(0, 0); render(); break;
+      case 'irConferir': S.tab = 'faltas'; S.faltaModo = 'conferir'; S.cli = null; window.scrollTo(0, 0); render(); break;
+      case 'irMais': S.tab = 'mais'; S.sub = null; window.scrollTo(0, 0); render(); break;
+      case 'faltaModo': S.faltaModo = el.dataset.m; render(); break;
+      case 'rotData': S.rotData = el.dataset.d; S.rotEditar = false; render(); break;
+      case 'rotEditar': S.rotEditar = !S.rotEditar; render(); break;
+      case 'rotIncluir': { const d = el.dataset.d; const sel = rotClientes(d); if (!sel.includes(id)) sel.push(id); await salvarRoteiro(sel, d); vibrar(); break; }
+      case 'pedido': { const marcou = await togglePedido(id, el.dataset.d || hojeISO()); toast(marcou ? 'Pedido registrado ✓' : 'Pedido desmarcado'); break; }
+      case 'chegouGrupo': { const n = await marcarGrupo(el.dataset.k, true); toast(`Chegou! ${n} ${pl(n, 'cliente para avisar', 'clientes para avisar')} no Início.`); break; }
+      case 'naoChegou': await marcarGrupo(el.dataset.k, false); toast('Conferido. Fica para a próxima.'); break;
       case 'rotPor': S.modal.sel.push(id); renderModal(); break;
-      case 'rotTirar': S.modal.sel.splice(Number(el.dataset.i), 1); renderModal(); break;
-      case 'rotUp': case 'rotDown': { const i = Number(el.dataset.i), j = act === 'rotUp' ? i - 1 : i + 1; const s = S.modal.sel; if (j < 0 || j >= s.length) break; [s[i], s[j]] = [s[j], s[i]]; renderModal(); break; }
+      case 'rotTirar': { const d = S.rotData || hojeISO(); await salvarRoteiro(rotClientes(d).filter(x => x !== id), d); break; }
+      case 'rotUp': case 'rotDown': { const d = S.rotData || hojeISO(); const s = rotClientes(d); const i = Number(el.dataset.i), j = act === 'rotUp' ? i - 1 : i + 1; if (j < 0 || j >= s.length) break; [s[i], s[j]] = [s[j], s[i]]; await salvarRoteiro(s, d); break; }
       case 'rotSalvar': { const amanha = S.modal.dia === 1; await salvarRoteiro(S.modal.sel.slice(), amanha ? dataISO(1) : hojeISO()); closeModal(); toast(amanha ? 'Roteiro de amanhã salvo' : 'Roteiro salvo'); break; }
       case 'rotDia': { const d = Number(el.dataset.d); const r = roteiro(d ? dataISO(1) : hojeISO()); S.modal.dia = d; S.modal.sel = r ? (r.clientes || []).filter(x => cli(x)) : []; renderModal(); break; }
       case 'temMercos': await setStatus(id, 'disponivel', 'mercos'); vibrar(); toast('Marcada como Disponível'); break;
@@ -1320,7 +1421,7 @@ document.addEventListener('input', e => {
   const k = t.dataset && t.dataset.in; if (!k) return;
   if (k === 'impTexto') { S.imp.texto = t.value; return; }
   S[k] = t.value;
-  if (k === 'busca' || k === 'buscaCli' || k === 'buscaCat') render();
+  if (k === 'busca' || k === 'buscaCli' || k === 'buscaCat' || k === 'buscaRot') render();
 });
 document.addEventListener('keydown', e => {
   const t = e.target; if (e.key !== 'Enter' || !t.dataset || !t.dataset.fl || !S.modal || S.modal.type !== 'faltas') return;
@@ -1349,7 +1450,7 @@ document.addEventListener('submit', async e => {
       if (!o.nome.trim()) { toast('Informe o nome da loja'); return; }
       btn.disabled = true;
       const id = S.modal.id || newId('c'); const old = items.get(id) || {};
-      await save(id, { ...old, kind: 'cliente', nome: o.nome.trim(), endereco: (o.endereco || '').trim(), cidade: o.cidade.trim(), comprador: o.comprador.trim(), telefone: o.telefone.trim(), diasVisita: fd.getAll('dia').map(Number), freq: o.freq ? Number(o.freq) : null, notas: old.notas || [], visitas: old.visitas || [], criadoEm: old.criadoEm || now() });
+      await save(id, { ...old, kind: 'cliente', nome: o.nome.trim(), endereco: o.endereco !== undefined ? o.endereco.trim() : (old.endereco || ''), cidade: o.cidade.trim(), comprador: o.comprador.trim(), telefone: o.telefone.trim(), diasVisita: fd.getAll('dia').map(Number), freq: o.freq ? Number(o.freq) : null, notas: old.notas || [], visitas: old.visitas || [], criadoEm: old.criadoEm || now() });
       closeModal(); toast('Cliente salvo');
       if (!old.kind) { S.cli = id; S.tab = 'clientes'; S.cliTab = 'faltas'; render(); }
     } else if (tipo === 'falta') {
