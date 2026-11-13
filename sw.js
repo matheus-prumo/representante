@@ -1,6 +1,6 @@
 // App do Representante - service worker (v1.3, GitHub Pages)
 // Faz o app abrir sem internet e recebe prints compartilhados do WhatsApp.
-const VERSAO = '1.9';
+const VERSAO = '2.0';
 const SHELL = 'rep-shell-' + VERSAO;
 const CDN = 'rep-cdn-1';
 const BASE = new URL('./', self.location).pathname; // ex.: /representante/

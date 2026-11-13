@@ -120,7 +120,7 @@ a{color:var(--ol)}
 <div id="modal"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
-const VERSAO = '1.9';
+const VERSAO = '2.0';
 const PEDIDOS = false; // pedidos ficam no Mercos
 // ponte opcional no Termux (OneDrive automático e leitura de prints mais precisa)
 const PONTE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') && location.port === '8765' ? '' : 'http://127.0.0.1:8765';
@@ -163,14 +163,15 @@ const I = {
   gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
   msg: '<path d="M4 5h16v11H8l-4 4z"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
-  upload: '<path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v5h16v-5"/>'
+  upload: '<path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v5h16v-5"/>',
+  alerta: '<path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17v.5"/>'
 };
 const svg = (p, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 
 let srv = { online: false, onedrive: false, ultimoSync: null, erroSync: null, ocr: false, versao: VERSAO };
 const items = new Map();
 const S = {
-  tab: 'inicio', sub: null, cli: null, cliTab: 'faltas', faltaModo: 'lista', rotData: null, rotEditar: false, buscaRot: '', filtro: 'disponivel', busca: '', buscaCli: '', buscaCat: '', nota: '',
+  tab: 'inicio', sub: null, cli: null, cliTab: 'faltas', faltaModo: 'lista', ocFiltro: 'aenviar', rotData: null, rotEditar: false, buscaRot: '', filtro: 'disponivel', busca: '', buscaCli: '', buscaCat: '', nota: '',
   loaded: false, dbErr: null, modal: null,
   imp: { status: 'disponivel', fase: 'idle', res: null, match: null, sel: new Set(), erro: null, texto: '', mostraTexto: false, progresso: '' }
 };
@@ -407,6 +408,13 @@ function vInicio() {
   }
   if (srv.online && srv.recebidos && !(S.imp.pendentes || []).length) h += `<button class="card linkbtn row" data-act="verRecebidos" style="justify-content:space-between;flex-wrap:nowrap;background:var(--oll);border-color:var(--olt)"><span><span class="t" style="display:block">${srv.recebidos} ${pl(srv.recebidos, 'print recebido', 'prints recebidos')} pelo Termux</span><span class="m" style="display:block">Toque para ler em Chegadas</span></span>${svg(I.chev, 20)}</button>`;
   if ((S.imp.pendentes || []).length) h += `<button class="card linkbtn row" data-act="tab" data-t="chegadas" style="justify-content:space-between;flex-wrap:nowrap;background:var(--oll);border-color:var(--olt)"><span><span class="t" style="display:block">${S.imp.pendentes.length} ${pl(S.imp.pendentes.length, 'print esperando', 'prints esperando')} leitura</span><span class="m" style="display:block">Toque para ler em Chegadas</span></span>${svg(I.chev, 20)}</button>`;
+  // ocorrências a enviar
+  const ocp = ocorrencias().filter(o => o.status === 'aenviar');
+  if (ocp.length) {
+    h += `<section class="card stack" style="gap:6px;border-color:#F3C77A;background:#FFFBEB"><div class="item" style="align-items:center"><span class="eyebrow" style="color:#92400E">${svg(I.alerta, 16)} Ocorrências para enviar à Ramada</span><span class="chip" style="color:#92400E;background:#FEF3C7">${ocp.length}</span></div>
+      ${ocp.slice(0, 5).map(o => `<div class="line"><button class="linkbtn" style="flex:1;min-width:0" data-act="openCliOc" data-id="${esc(o.clienteId)}"><span class="t" style="display:block">${esc((cli(o.clienteId) || {}).nome || 'Cliente')}</span><span class="m" style="display:block">${esc(o.tipo)} · ${esc(o.texto.slice(0, 60))}${o.texto.length > 60 ? '…' : ''}</span></button></div>`).join('')}
+      <div class="grid2" style="margin-top:4px"><a class="btn wa sm" href="${esc(waRamada(ocp))}" target="_blank" rel="noopener" data-act="ocEnviarTodas">${svg(I.wa, 16)}Enviar ${ocp.length > 1 ? 'todas' : ''}</a><button class="btn sm" data-act="irOcorrencias">Ver ocorrências</button></div></section>`;
+  }
   // roteiro de hoje
   const rot = roteiro(); const rl = rotClientes(hojeISO());
   if (clientes().length) {
@@ -511,9 +519,11 @@ function vCliente() {
       ${c.endereco ? `<p class="sub">${esc(c.endereco)}</p>` : ''}${c.telefone ? `<p class="sub">${esc(c.telefone)}</p>` : ''}</div>
     <div class="grid3">${tel ? `<a class="btn sm" href="${esc(waLink(c))}" target="_blank" rel="noopener">${svg(I.wa, 18)}WhatsApp</a><a class="btn sm" href="tel:${esc(tel)}">${svg(I.phone, 18)}Ligar</a>` : `<button class="btn sm" data-act="editCli" data-id="${esc(c.id)}" style="grid-column:span 2">Adicionar telefone</button>`}<button class="btn sm pri" data-act="registrarVisita" data-id="${esc(c.id)}">${svg(I.check, 18)}Visitei</button></div>
     <div class="grid2"><button class="btn sm tint" data-act="novaFalta" data-id="${esc(c.id)}">${svg(I.plus, 18)}Registrar falta</button>${(() => { const ped = pedidoNoDia(c, hojeISO()); return `<button class="btn sm ${ped ? '' : 'tint'}" data-act="pedido" data-id="${esc(c.id)}" data-d="${hojeISO()}" aria-pressed="${ped}" style="${ped ? 'background:#DCFCE7;border-color:#86EFAC;color:#166534' : ''}">${svg(ped ? I.check : I.cart, 18)}${ped ? 'Fez pedido hoje' : 'Fez pedido'}</button>`; })()}</div>
+    <button class="btn sm tint" data-act="novaOcorrencia" data-id="${esc(c.id)}">${svg(I.alerta, 18)}Registrar ocorrência</button>
   </section>`;
   if (disp.length) h += `<section class="hero stack" style="margin-top:12px;gap:10px"><span class="eyebrow">Ofereça nesta visita</span><h2 style="color:#fff">${disp.length} ${pl(disp.length, 'produto liberado', 'produtos liberados')}</h2><div class="grid2"><a class="btn wa sm" href="${esc(waLink(c, disp, 'disp'))}" target="_blank" rel="noopener">${svg(I.wa, 18)}Avisar</a><button class="btn sm" data-act="ofertarCli" data-id="${esc(c.id)}">Ofereci tudo</button></div></section>`;
-  const tabs = [['faltas', `Faltas (${mine.filter(f => !['vendido', 'cancelado'].includes(f.status)).length})`], ['pedidos', `Pedidos (${peds.length})`], ['visitas', 'Visitas e notas']].filter(([k]) => PEDIDOS || k !== 'pedidos');
+  const ocs = ocorrencias().filter(o => o.clienteId === c.id); const ocAb = ocs.filter(o => o.status !== 'resolvida').length;
+  const tabs = [['faltas', `Faltas (${mine.filter(f => !['vendido', 'cancelado'].includes(f.status)).length})`], ['pedidos', `Pedidos (${peds.length})`], ['ocorrencias', `Ocorrências${ocAb ? ' (' + ocAb + ')' : ''}`], ['visitas', 'Visitas']].filter(([k]) => PEDIDOS || k !== 'pedidos');
   h += `<div class="seg" role="group" aria-label="Seções do cliente" style="margin-top:14px">${tabs.map(([k, l]) => `<button data-act="cliTab" data-t="${k}" aria-pressed="${S.cliTab === k}">${l}</button>`).join('')}</div><div class="stack" style="margin-top:12px">`;
   if (S.cliTab === 'faltas') {
     if (!mine.length) h += `<div class="empty">Nenhuma falta registrada para este cliente.</div>`;
@@ -522,6 +532,9 @@ function vCliente() {
       if (!l.length) continue;
       h += `<span class="eyebrow" style="margin-top:4px">${ST[k].label} · ${l.length}</span>${l.map(f => faltaCard(f, false)).join('')}`;
     }
+  } else if (S.cliTab === 'ocorrencias') {
+    h += ocs.length ? ocs.map(o => ocCard(o, false)).join('') : `<div class="empty">Nenhuma ocorrência para este cliente.</div>`;
+    h += `<button class="btn tint" data-act="novaOcorrencia" data-id="${esc(c.id)}">${svg(I.plus, 18)}Registrar ocorrência</button>`;
   } else if (S.cliTab === 'pedidos') {
     if (!peds.length) h += `<div class="empty">Nenhum pedido anotado para este cliente.</div>`;
     else { const tot = peds.reduce((s, p) => s + (Number(p.total) || 0), 0); h += `<p class="hint" style="margin:0">${peds.length} ${pl(peds.length, 'pedido', 'pedidos')} · total ${reais(tot)}</p>${peds.map(p => pedidoCard(p, false)).join('')}`; }
@@ -584,14 +597,16 @@ function vMais() {
   if (S.sub === 'backup') return vBackup();
   if (S.sub === 'mensagens') return vMensagens();
   if (S.sub === 'config') return vConfig();
+  if (S.sub === 'ocorrencias') return vOcorrencias();
   const pm = pedidos();
   const row = (sub, ic, t, d) => `<button class="linkbtn" data-act="sub" data-s="${sub}"><span class="mic">${svg(ic, 22)}</span><span style="flex:1;min-width:0"><span class="t" style="display:block">${t}</span><span class="m" style="display:block">${d}</span></span>${svg(I.chev, 20)}</button>`;
   const uc = ultimaCopia();
   return `${barra('Mais')}<div class="stack"><section class="card menu" style="padding:4px 16px">
     ${!PEDIDOS ? '' : row('pedidos', I.cart, 'Pedidos', `${pm.length} ${pl(pm.length, 'pedido', 'pedidos')} · ${pm.filter(p => sameMonth(p.em)).length} neste mês`)}
+    ${row('ocorrencias', I.alerta, 'Ocorrências', (() => { const n = ocorrencias().filter(o => o.status === 'aenviar').length, t = ocorrencias().length; return n ? n + ' a enviar à Ramada' : t + ' ' + pl(t, 'registrada', 'registradas'); })())}
     ${row('catalogo', I.book, 'Catálogo Ramada', `${produtos().length} produtos conhecidos`)}
     ${row('backup', I.cloud, 'Backup e OneDrive', `Última cópia: ${uc ? dm(uc) + ' ' + hm(uc) : 'nunca'}`)}
-    ${row('mensagens', I.msg, 'Mensagens do WhatsApp', 'Textos dos avisos aos clientes')}
+    ${row('mensagens', I.msg, 'Mensagens do WhatsApp', 'Avisos aos clientes e WhatsApp da Ramada')}
     ${row('config', I.gear, 'Visitas', `Frequência padrão: a cada ${Number(cfg().freq) || 14} dias`)}
   </section>
   <span class="eyebrow">Opcional</span>
@@ -601,7 +616,8 @@ function vMais() {
   ${botaoImport('clientes', 'Importar clientes de planilha ou contatos', 'tint sm')}
   <section class="card stack" style="gap:6px"><span class="t">Representante · versão ${VERSAO}</span>
     <p class="hint" style="margin:0">${clientes().length} clientes · ${faltas().length} faltas · ${produtos().length} produtos no catálogo · Termux: ${srv.online ? 'ligado' : 'desligado'}</p>
-    <details><summary>Novidades das versões 1.4 a 1.9</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+    <details><summary>Novidades das versões 1.4 a 2.0</summary><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.6;color:var(--mu)">
+      <li>2.0: ocorrências por cliente para enviar à Ramada (avaria, troca, financeiro…)</li>
       <li>1.9: app mais simples: registrar falta › conferir no Mercos › avisar</li>
       <li>1.9: aba Roteiro (planeje a noite anterior) e botão Pedido que fica verde</li>
       <li>1.9: cadastro rápido do cliente; prints e importação viraram opcionais em Mais</li>
@@ -672,6 +688,7 @@ function vMensagens() {
   return `${barra('Mensagens', 'subVoltar')}<p class="sub" style="margin:-4px 0 14px">Textos usados no botão “Avisar”. Use <b>{comprador}</b> para o primeiro nome do comprador, <b>{loja}</b> para o nome da loja e <b>{lista}</b> para a lista de produtos.</p>
   <form class="stack" data-form="mensagens">
     <label class="f">Quando está disponível<textarea name="msgDisp" class="inp" style="min-height:150px">${esc(c.msgDisp || MSG_DISP)}</textarea></label>
+    <label class="f">WhatsApp da Ramada para ocorrências (opcional)<input name="telRamada" class="inp" type="tel" inputmode="tel" placeholder="(00) 00000-0000" value="${esc(c.telRamada || '')}"><span class="hint">Com o número, “Enviar à Ramada” já abre a conversa certa. Sem ele, você escolhe o contato.</span></label>
     <label class="f">Quando está armazenando<textarea name="msgArm" class="inp" style="min-height:150px">${esc(c.msgArm || MSG_ARM)}</textarea></label>
     <button class="btn pri" type="submit">Salvar mensagens</button>
     <button class="btn ghost" type="button" data-act="msgPadrao">Voltar ao texto padrão</button>
@@ -815,6 +832,21 @@ function renderModal() {
       ${falta.length ? `<p class="hint" style="margin:0;color:var(--rd)">Escolha a coluna de: ${falta.join(', ')}.</p>` : `<div class="card" style="padding:12px 14px;background:var(--oll);border-color:var(--olt)"><div class="t">${m.tipo === 'clientes' ? `${res.novos} ${pl(res.novos, 'cliente novo', 'clientes novos')}${res.ja ? ` · ${res.ja} já ${pl(res.ja, 'cadastrado', 'cadastrados')} (não ${pl(res.ja, 'muda', 'mudam')})` : ''}` : `${res.novos} ${pl(res.novos, 'produto novo', 'produtos novos')}${res.ja ? ` · ${res.ja} ${pl(res.ja, 'atualizado', 'atualizados')}` : ''}`}</div>
         ${amostra.map(x => `<div class="m">${m.tipo === 'clientes' ? esc(x.nome) + (x.cidade ? ' · ' + esc(x.cidade) : '') + (x.telefone ? ' · ' + esc(x.telefone) : '') : esc(x.codigo) + ' · ' + esc(x.descricao) + (x.marca ? ' · ' + esc(x.marca) : '') + (x.preco ? ' · ' + reais(x.preco) : '')}</div>`).join('')}${res.lista.length > 4 ? `<div class="m">… e mais ${res.lista.length - 4}</div>` : ''}</div>`}
       <button class="btn pri block" data-act="impConfirmar" ${falta.length || !res.lista.length ? 'disabled' : ''}>Importar ${res.lista.length || ''}</button></div>`;
+  } else if (m.type === 'ocorrencia') {
+    const oc = m.id ? items.get(m.id) || {} : {};
+    const cid = oc.clienteId || m.clienteId || '';
+    const tp = oc.tipo || 'Avaria';
+    inner = `<form class="sheet stack" data-form="ocorrencia" style="gap:14px">${head(m.id ? 'Editar ocorrência' : 'Registrar ocorrência')}
+      <label class="f">Cliente<select name="clienteId" class="inp" required><option value="">Escolha…</option>${clientes().map(c => `<option value="${esc(c.id)}" ${c.id === cid ? 'selected' : ''}>${esc(c.nome)}</option>`).join('')}</select></label>
+      <fieldset style="border:0;margin:0;padding:0"><legend style="font-size:14px;font-weight:600;margin-bottom:8px">Tipo</legend><div class="days">${TIPOS_OC.map(t => `<label><input type="radio" name="tipo" value="${esc(t)}" ${t === tp ? 'checked' : ''}><span style="padding:0 12px">${esc(t)}</span></label>`).join('')}</div></fieldset>
+      <label class="f">O que aconteceu?<textarea name="texto" class="inp" required placeholder="Ex.: 2 caixas de dobradiça chegaram amassadas, NF 12345. Cliente quer troca.">${esc(oc.texto || '')}</textarea></label>
+      <button class="btn pri block" type="submit">Salvar ocorrência</button></form>`;
+  } else if (m.type === 'ocMenu') {
+    const oc = items.get(m.id); if (!oc) { S.modal = null; el.innerHTML = ''; return; }
+    inner = `<div class="sheet stack">${head(esc(oc.tipo))}<p class="sub" style="margin-top:-6px">${esc((cli(oc.clienteId) || {}).nome || '')} · ${STO[oc.status].label}</p>
+      <span class="eyebrow">Mudar situação</span><div class="grid2">${Object.keys(STO).filter(k => k !== oc.status).map(k => `<button class="btn sm" data-act="ocSt" data-id="${oc.id}" data-s="${k}" data-close="1">${STO[k].label}</button>`).join('')}</div>
+      <button class="btn" data-act="editOcorrencia" data-id="${oc.id}">Editar</button>
+      <button class="btn danger" data-act="delOcorrencia" data-id="${oc.id}">Excluir ocorrência</button></div>`;
   } else if (m.type === 'confirm') {
     inner = `<div class="sheet stack">${head('Tem certeza?')}<p class="sub" style="margin:0">${esc(m.text)}</p><div class="grid2"><button class="btn" data-act="closeModal">Cancelar</button><button class="btn dangerfill" data-act="confirmYes">${esc(m.ok || 'Excluir')}</button></div></div>`;
   } else if (m.type === 'restore') {
@@ -1171,6 +1203,48 @@ async function marcarVisita(cid, obs) {
   aposMudar(); vibrar();
 }
 
+/* ---------- ocorrências (para mandar à Ramada) ---------- */
+const TIPOS_OC = ['Avaria', 'Troca / devolução', 'Financeiro', 'Entrega', 'Preço', 'Outro'];
+const STO = { aenviar: { label: 'A enviar', fg: '#92400E', bg: '#FEF3C7' }, enviada: { label: 'Enviada à Ramada', fg: '#1E40AF', bg: '#DBEAFE' }, resolvida: { label: 'Resolvida', fg: '#166534', bg: '#DCFCE7' } };
+const ocorrencias = () => doTipo('ocorrencia').sort((a, b) => (b.criadoEm || '').localeCompare(a.criadoEm || ''));
+const chipO = st => { const s = STO[st] || STO.aenviar; return `<span class="chip" style="color:${s.fg};background:${s.bg}">${s.label}</span>`; };
+function textoOcorrencias(lista) {
+  const g = groupBy(lista, 'clienteId');
+  const partes = [...g].map(([cid, l]) => { const c = cli(cid) || {}; return `*${c.nome || 'Cliente'}*${c.cidade ? ' (' + c.cidade + ')' : ''}\n` + l.map(o => `• ${o.tipo} – ${o.texto} (${dm(o.criadoEm)})`).join('\n'); });
+  return `${lista.length > 1 ? 'Ocorrências de clientes' : 'Ocorrência de cliente'}:\n\n${partes.join('\n\n')}`;
+}
+function waRamada(lista) {
+  const tel = String(cfg().telRamada || '').replace(/\D/g, '');
+  const num = tel ? (tel.length <= 11 ? '55' + tel : tel) : '';
+  return `https://wa.me/${num}?text=${encodeURIComponent(textoOcorrencias(lista))}`;
+}
+function ocCard(o, showCli = true) {
+  const c = cli(o.clienteId) || {};
+  let acts = '';
+  if (o.status === 'aenviar') acts = `<a class="btn sm wa" href="${esc(waRamada([o]))}" target="_blank" rel="noopener" data-act="ocEnviada" data-id="${o.id}">${svg(I.wa, 16)}Enviar à Ramada</a><button class="btn sm" data-act="ocSt" data-id="${o.id}" data-s="enviada">Já enviei</button>`;
+  else if (o.status === 'enviada') acts = `<button class="btn sm pri" data-act="ocSt" data-id="${o.id}" data-s="resolvida">${svg(I.check, 16)}Resolvida</button>`;
+  return `<article class="card" style="padding:14px"><div class="item"><div style="min-width:0">
+    <div class="t">${esc(o.tipo)}</div>${showCli ? `<div class="m" style="color:var(--ink);font-weight:500">${esc(c.nome || 'Cliente removido')}</div>` : ''}
+    <div class="m" style="white-space:pre-wrap;color:var(--ink)">${esc(o.texto)}</div>
+    <div class="m">${dm(o.criadoEm)}${o.enviadaEm ? ' · enviada ' + dm(o.enviadaEm) : ''}${o.resolvidaEm ? ' · resolvida ' + dm(o.resolvidaEm) : ''}</div></div>${chipO(o.status)}</div>
+    <div class="row" style="margin-top:10px">${acts}<button class="btn sm ghost" data-act="ocMenu" data-id="${o.id}">${svg(I.more, 20)} Opções</button></div></article>`;
+}
+async function ocStatus(ids, st) {
+  const em = now();
+  const lista = ids.map(id => items.get(id)).filter(Boolean).map(o => ({ ...o, status: st, ...(st === 'enviada' ? { enviadaEm: em } : {}), ...(st === 'resolvida' ? { resolvidaEm: em } : {}), ...(st === 'aenviar' ? { enviadaEm: null, resolvidaEm: null } : {}) }));
+  await saveMany(lista); vibrar();
+}
+function vOcorrencias() {
+  const todas = ocorrencias(); const f = S.ocFiltro || 'aenviar';
+  const cnt = k => todas.filter(o => o.status === k).length;
+  const lista = f === 'todas' ? todas : todas.filter(o => o.status === f);
+  const pend = todas.filter(o => o.status === 'aenviar');
+  return `${barra('Ocorrências', 'subVoltar')}<p class="sub" style="margin:-4px 0 14px">Problemas dos clientes para passar à Ramada. Registre na ficha do cliente.</p><div class="stack">
+    ${pend.length > 1 ? `<a class="btn wa" href="${esc(waRamada(pend))}" target="_blank" rel="noopener" data-act="ocEnviarTodas">${svg(I.wa, 18)}Enviar as ${pend.length} à Ramada numa mensagem</a>` : ''}
+    <div class="chips" role="group" aria-label="Filtrar ocorrências">${[['aenviar', 'A enviar'], ['enviada', 'Enviadas'], ['resolvida', 'Resolvidas'], ['todas', 'Todas']].map(([k, l]) => `<button class="fchip" data-act="ocFiltro" data-f="${k}" aria-pressed="${f === k}">${l}${k !== 'todas' ? ' · ' + cnt(k) : ''}</button>`).join('')}</div>
+    <div class="list">${lista.length ? lista.map(o => ocCard(o)).join('') : `<div class="empty">${todas.length ? 'Nada aqui.' : 'Nenhuma ocorrência registrada.'}</div>`}</div></div>`;
+}
+
 /* ---------- roteiro (aba) ---------- */
 const isoLocal = iso => { const d = new Date(iso); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const diasProximos = () => Array.from({ length: 7 }, (_, i) => dataISO(i));
@@ -1300,12 +1374,23 @@ document.addEventListener('click', async e => {
       case 'ofertarCli': { el.disabled = true; const l = faltas().filter(f => f.clienteId === id && f.status === 'disponivel'); for (const f of l) await setStatus(f.id, 'ofertado'); vibrar(); toast(`${l.length} ${pl(l.length, 'marcada', 'marcadas')} como ofertado`); break; }
       case 'delFalta': openModal({ type: 'confirm', text: 'Excluir esta falta? Isso não pode ser desfeito.', action: 'delFalta', id }); break;
       case 'delCli': { const n = faltas().filter(f => f.clienteId === id).length; openModal({ type: 'confirm', text: `Excluir este cliente${n ? ' e suas ' + n + ' faltas' : ''}? Os pedidos ficam guardados. Isso não pode ser desfeito.`, action: 'delCli', id }); break; }
+      case 'novaOcorrencia': openModal({ type: 'ocorrencia', clienteId: id || null }); break;
+      case 'editOcorrencia': openModal({ type: 'ocorrencia', id }); break;
+      case 'ocMenu': openModal({ type: 'ocMenu', id }); break;
+      case 'ocSt': await ocStatus([id], el.dataset.s); if (el.dataset.close) closeModal(); toast(STO[el.dataset.s].label); break;
+      case 'ocEnviada': setTimeout(async () => { await ocStatus([id], 'enviada'); toast('Marcada como enviada à Ramada'); }, 300); break;
+      case 'ocEnviarTodas': { const ids = ocorrencias().filter(o => o.status === 'aenviar').map(o => o.id); setTimeout(async () => { await ocStatus(ids, 'enviada'); toast(`${ids.length} ${pl(ids.length, 'marcada', 'marcadas')} como enviada`); }, 300); break; }
+      case 'ocFiltro': S.ocFiltro = el.dataset.f; render(); break;
+      case 'irOcorrencias': S.tab = 'mais'; S.sub = 'ocorrencias'; S.ocFiltro = 'aenviar'; window.scrollTo(0, 0); render(); break;
+      case 'openCliOc': S.cli = id; S.tab = 'clientes'; S.cliTab = 'ocorrencias'; window.scrollTo(0, 0); render(); break;
+      case 'delOcorrencia': openModal({ type: 'confirm', text: 'Excluir esta ocorrência? Isso não pode ser desfeito.', action: 'delOcorrencia', id }); break;
       case 'delPedido': openModal({ type: 'confirm', text: 'Excluir este pedido? Isso não pode ser desfeito.', action: 'delPedido', id }); break;
       case 'delProduto': openModal({ type: 'confirm', text: 'Tirar este produto do catálogo? Ele volta se aparecer num print.', action: 'delProduto', id, ok: 'Tirar' }); break;
       case 'confirmYes': {
         const m = S.modal; closeModal();
         if (m.action === 'delFalta') { await del(m.id); toast('Falta excluída'); }
         if (m.action === 'delPedido') { await del(m.id); toast('Pedido excluído'); }
+        if (m.action === 'delOcorrencia') { await del(m.id); toast('Ocorrência excluída'); }
         if (m.action === 'delProduto') { await del(m.id); toast('Produto retirado'); }
         if (m.action === 'delCli') { for (const f of faltas().filter(f => f.clienteId === m.id)) await del(f.id); await del(m.id); S.cli = null; render(); toast('Cliente excluído'); }
         break;
@@ -1510,8 +1595,15 @@ document.addEventListener('submit', async e => {
       const id = S.modal.id || 'p_' + k; const old = items.get(id) || {};
       await save(id, { ...old, kind: 'produto', codigo: old.codigo || k, descricao: o.descricao.trim(), marca: o.marca.trim(), preco: o.preco ? numBR(o.preco) : null, manual: true, aprendidoEm: old.aprendidoEm || now() });
       closeModal(); toast('Produto salvo');
+    } else if (tipo === 'ocorrencia') {
+      if (!o.clienteId) { toast('Escolha o cliente'); return; }
+      if (!(o.texto || '').trim()) { toast('Escreva o que aconteceu'); return; }
+      btn.disabled = true;
+      const id = S.modal.id || newId('oc'); const old = items.get(id) || {};
+      await save(id, { ...old, kind: 'ocorrencia', clienteId: o.clienteId, tipo: o.tipo || 'Outro', texto: o.texto.trim(), status: old.status || 'aenviar', criadoEm: old.criadoEm || now() });
+      closeModal(); vibrar(); toast(old.kind ? 'Ocorrência atualizada' : 'Ocorrência registrada. Fica no Início até você enviar.');
     } else if (tipo === 'mensagens') {
-      const c = cfg(); await save('cfg', { ...c, kind: 'cfg', msgDisp: o.msgDisp, msgArm: o.msgArm }); toast('Mensagens salvas');
+      const c = cfg(); await save('cfg', { ...c, kind: 'cfg', msgDisp: o.msgDisp, msgArm: o.msgArm, telRamada: (o.telRamada || '').trim() }); toast('Mensagens salvas');
     } else if (tipo === 'config') {
       const c = cfg(); await save('cfg', { ...c, kind: 'cfg', freq: Number(o.freq) || 14 }); toast('Frequência salva');
     }
